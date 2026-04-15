@@ -116,13 +116,12 @@
     };
 
     let currentPath = '/home';
-    let commandHistory = [];
     let rogueActive = false;
     let failCount = 0;
 
     const asciiArt = { ghost: ` .---.\n/     \\\n| () () |  <-- ROGUE DETECTED (PID: 1337)\n \\  ^  /\n  |||||\n  ||||| ` };
 
-    const vfs = {
+    const vfs = { /* unchanged - same as your version */ 
         '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt', 'logs.txt', 'restrict_access.key'] },
         '/home/README.txt': { type: 'file', content: 'STATION DELTA: Emergency Protocol Active.' },
         '/home/manual.txt': { type: 'file', content: 'Pro tip: Type "man <command>" for technical specs.' },
@@ -133,7 +132,7 @@
         '/home/projects/game_v1/main.js': { type: 'file', content: 'console.log("Escape Pod ready!");' }
     };
 
-    const helpDB = {
+    const helpDB = { /* your improved version kept */ 
         'man': { desc: 'Display manual', why: 'Lists all available commands and their usage.' },
         'ls': { desc: 'List contents', why: 'Shows files/folders in your current location.' },
         'pwd': { desc: 'Print working directory', why: 'Tells you exactly where you are.' },
@@ -146,7 +145,7 @@
         'vibe': { desc: 'AI Orchestrator', why: 'Commands specifically for managing AI agents.' }
     };
 
-    const phases = [null,
+    const phases = [null, /* your updated phases kept exactly as you wrote them */ 
         { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your GPS." }] },
         { 
             title: "Privilege Escalation", 
@@ -240,11 +239,15 @@
 
         if (lower === 'man') {
             log(`=== MANUAL ===`, 'highlight');
-            Object.keys(helpDB).forEach(k => log(`• ${k.padEnd(6)} | ${helpDB[k].desc}`, 'highlight'));
+            log(`Type "man <command>" for full details.`);
+            Object.keys(helpDB).forEach(k => {
+                if (k !== 'man') log(`• ${k.padEnd(6)} | ${helpDB[k].desc}`, 'highlight');
+            });
         } 
         else if (lower.startsWith('man ')) {
             const c = lower.split(' ')[1];
-            if (helpDB[c]) log(`${c.toUpperCase()}: ${helpDB[c].why}`);
+            if (helpDB[c]) log(`${c.toUpperCase()}: ${helpDB[c].why}`, 'highlight');
+            else log("Command not found. Type just 'man' to see all commands.", 'highlight');
         }
         else if (lower === 'ls') log(vfs[currentPath].children.join('  '));
         else if (lower === 'pwd') log(currentPath);
@@ -260,8 +263,17 @@
         }
         else if (lower.includes('sudo cat restrict_access.key')) log("Key: XJ-99", 'success');
         else if (lower.includes('cat logs.txt | grep critical')) log("CRITICAL: Power failing\nCRITICAL: Escape Pod locked");
-        else if (lower.includes('vibe build') && state.phase === 12) streamBuild();
+        else if (lower.includes('cat logs.txt | grep CRITICAL | vibe explain')) log("Analysis: Rogue agent at PID 1337.", 'lola');
+        else if (lower.includes('vibe explain --json')) log('{"target": "1337"}', 'lola');
+        else if (lower.includes('vibe auth')) log("Authorized.", 'success');
+        else if (lower === 'vibe mcp init') log("MCP Online.", 'success');
+        else if (lower.includes('vibe prompt --edit')) log("Rules updated.", 'success');
+        else if (lower.startsWith('kill 1337')) {
+            if (state.phase >= 11) { log("Terminated.", "success"); rogueActive = false; }
+            else log("Permission denied.", "error");
+        }
         else if (lower === 'vibe status') log("ENGINEER: Ready | CAPTAIN: Idle");
+        else if (lower.includes('vibe build') && state.phase === 12) streamBuild();
 
         checkObjective(val);
         updateUI();
@@ -305,9 +317,13 @@
     function streamBuild() {
         const lines = ["Compiling...", "Orchestrating...", "Launch!"];
         let i = 0;
+        const target = document.getElementById('code-content');
+        target.innerHTML = "";
         const interval = setInterval(() => {
             if (i >= lines.length) { clearInterval(interval); return; }
-            sysLog(lines[i++]);
+            target.innerHTML += `> ${lines[i]}\n`;
+            sysLog(lines[i]);
+            i++;
         }, 600);
     }
 
@@ -323,11 +339,24 @@
         updateUI();
     }
 
-    function finishGame() { document.getElementById('grad-modal').style.display = 'flex'; }
-    function exportManifest() { alert("Manifest downloaded!"); }
+    function finishGame() {
+        document.getElementById('final-score').innerText = `Rating: ${100 - state.totalHints}%`;
+        document.getElementById('grad-modal').style.display = 'flex';
+    }
+
+    function exportManifest() {
+        const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Vibe_Manifest_${state.cadetName}.json`;
+        a.click();
+    }
 
     document.getElementById('command-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { handleCommand(e.target.value); e.target.value = ''; }
+        if (e.key === 'Enter') {
+            handleCommand(e.target.value);
+            e.target.value = '';
+        }
     });
 
     if (state.phase > 1) {
