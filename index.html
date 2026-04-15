@@ -146,13 +146,13 @@
     const phases = [null,
         { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your map." }] },
         { 
-            title: "Privilege Escalation", 
-            lola: "The system is locked down. Use **'ls'** to find the restricted access key.", 
-            objectives: [
-                { cmd: ["ls"], desc: "Type 'ls'", response: "I see it: 'restrict_access.key'.", explanation: "Find the lock before the key." },
-                { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'sudo' provides admin power to bypass permissions." }
-            ] 
-        },
+    title: "Privilege Escalation", 
+    lola: "Good job using **ls** — you just opened the folder and saw the files (like double-clicking on your desktop). Now you found a locked file called 'restrict_access.key'. To read what's inside any file in the terminal, use the command **cat** (it stands for 'concatenate' — basically 'show me the file contents'). But it's protected, so you need admin power first. Type exactly: **sudo cat restrict_access.key**", 
+    objectives: [
+        { cmd: ["ls"], desc: "Type 'ls'", response: "I see it: 'restrict_access.key'.", explanation: "ls = list everything inside the current folder." },
+        { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'cat' displays the file contents. 'sudo' (superuser do) gives you temporary admin rights to open locked files." }
+    ] 
+},
         { title: "Navigation", lola: "Excellent. Use **'cd'** (Change Directory) to move into the projects folder. Type: **'cd projects'**", objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to projects.", explanation: "'cd' is how you navigate folder structures." }] },
         { title: "Agent Status", lola: "Let's check our AI agents. Use the custom command **'vibe status'** to see if they are awake.", objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "Checking status ensures orchestration is stable." }] },
         { title: "MCP Init", lola: "Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a protocol that lets agents use local tools safely." }] },
