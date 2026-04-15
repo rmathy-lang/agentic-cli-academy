@@ -12,11 +12,10 @@
             --accent-color: #2ea043;
             --error-color: #f85149;
             --highlight-color: #f0883e;
-            --agent-color: #bc8cff;
             --border: #30363d;
-            --kw-color: #ff7b72; /* Keyword color */
-            --str-color: #a5d6ff; /* String color */
-            --fn-color: #d2a8ff; /* Function color */
+            --kw-color: #ff7b72;
+            --str-color: #a5d6ff;
+            --fn-color: #d2a8ff;
             --font-family: 'Fira Code', 'Courier New', monospace;
         }
 
@@ -29,206 +28,163 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
             background-size: 100% 2px, 3px 100%;
         }
 
         #academy-bar {
-            height: 40px;
-            background: #161b22;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            gap: 20px;
-            font-size: 0.8rem;
+            height: 40px; background: #161b22; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; gap: 20px; font-size: 0.8rem;
         }
-
         #progress-fill {
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-color), #58a6ff);
-            width: 0%;
-            transition: width 0.5s;
-            box-shadow: 0 0 10px var(--accent-color);
+            height: 4px; background: linear-gradient(90deg, var(--accent-color), #58a6ff);
+            width: 0%; transition: width 0.5s; box-shadow: 0 0 10px var(--accent-color);
         }
 
         #game-layout {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            grid-template-rows: 1fr 180px;
-            gap: 10px;
-            padding: 10px;
-            flex-grow: 1;
+            display: grid; grid-template-columns: 1fr 380px; grid-template-rows: 1fr 180px;
+            gap: 10px; padding: 10px; flex-grow: 1; visibility: hidden;
         }
 
-        .pane {
-            background: var(--bg-color);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+        .pane { background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+        .pane-header { background: #161b22; padding: 8px 12px; font-size: 0.7rem; color: #8b949e; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
 
-        .pane-header {
-            background: #161b22;
-            padding: 8px 12px;
-            font-size: 0.7rem;
-            color: #8b949e;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        #output { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column-reverse; font-size: 0.9rem; line-height: 1.5; }
-        .prompt-line { display: flex; padding: 10px; background: #0d1117; border-top: 1px solid var(--border); }
+        #output { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column-reverse; font-size: 0.95rem; line-height: 1.6; }
+        .prompt-line { display: flex; padding: 12px; background: #0d1117; border-top: 1px solid var(--border); }
         #command-input { flex-grow: 1; background: transparent; border: none; color: #fff; outline: none; font-family: inherit; font-size: 1rem; }
 
-        #code-pane { grid-row: 1 / 2; grid-column: 2 / 3; background: #010409; }
-        #code-content { padding: 15px; font-size: 0.85rem; white-space: pre-wrap; overflow-y: auto; color: #d1d5da; }
-
-        #logs-pane { grid-row: 2 / 3; grid-column: 1 / -1; }
+        #code-content { padding: 15px; font-size: 0.85rem; white-space: pre-wrap; color: #d1d5da; line-height: 1.4; overflow-y: auto; }
         #log-stream { padding: 10px; font-size: 0.75rem; color: #8b949e; overflow-y: auto; }
+
+        .modal { position: fixed; inset: 0; background: rgba(1,4,9,0.98); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: #161b22; border: 1px solid var(--accent-color); padding: 40px; max-width: 600px; border-radius: 12px; text-align: left; box-shadow: 0 0 30px rgba(46,160,67,0.2); }
 
         .lola { color: var(--accent-color); font-weight: bold; }
         .error { color: var(--error-color); }
-        .cmd { color: var(--prompt-color); }
         .success { color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); }
         .highlight { color: var(--highlight-color); font-weight: bold; }
-
-        /* Syntax Highlighting Classes */
-        .kw { color: var(--kw-color); }
-        .str { color: var(--str-color); }
-        .fn { color: var(--fn-color); }
-        .comment { color: #6a737d; font-style: italic; }
+        .kw { color: var(--kw-color); } .str { color: var(--str-color); } .fn { color: var(--fn-color); }
 
         .glitch { animation: glitch 0.2s infinite; }
-        @keyframes glitch { 
-            0% { transform: translate(0); } 
-            50% { transform: translate(-2px, 2px); background: rgba(255,0,0,0.1); } 
-            100% { transform: translate(0); }
-        }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background:#161b22; border:2px solid var(--accent-color); border-radius:12px; padding:30px; max-width:500px; width:90%; text-align:center; }
+        @keyframes glitch { 0% { transform: translate(0); } 50% { transform: translate(-2px, 2px); background: rgba(255,0,0,0.1); } 100% { transform: translate(0); } }
     </style>
 </head>
 <body onclick="document.getElementById('command-input').focus()">
 
+<div id="briefing-screen" class="modal">
+    <div class="modal-content">
+        <h1 style="color:var(--accent-color); margin-top:0;">📡 INCOMING TRANSMISSION</h1>
+        <p style="line-height:1.6; font-size: 1.1rem;">
+            The year is 2026. The <span class="highlight">Vibe-Station Delta</span> has gone dark. 
+            The Automated Fleet is paralyzed. We need a Cadet who can speak the language of the machine—<span class="highlight">The CLI</span>.
+        </p>
+        <p style="color:#8b949e;">
+            <strong>Your Mission:</strong> Navigate the station's file system, initialize the AI Command Crew, and build the Escape Pod landing page to bring the survivors home.
+        </p>
+        <div style="margin-top:30px; border-top: 1px solid var(--border); padding-top:20px;">
+            <label style="display:block; margin-bottom:10px; font-size:0.8rem; color:var(--prompt-color);">ENTER CALLSIGN TO INITIALIZE:</label>
+            <input type="text" id="callsign-input" placeholder="e.g. Maverick" 
+                   style="background:#0d1117; border:1px solid var(--border); color:white; padding:12px; width:100%; border-radius:6px; font-family:inherit;">
+            <button onclick="bootAcademy()" style="margin-top:20px; width:100%; padding:15px; background:var(--accent-color); border:none; color:#010409; font-weight:bold; border-radius:6px; cursor:pointer;">ACCEPT MISSION</button>
+        </div>
+    </div>
+</div>
+
 <div id="academy-bar">
     <span style="font-weight:bold; color:var(--accent-color)">VIBE_OS v2.9 • ELITE</span>
     <div style="flex:1; background:#30363d; height:4px; border-radius:2px;"><div id="progress-fill"></div></div>
-    <span id="phase-label">BOOTING...</span>
+    <span id="phase-label">PHASE 1/8</span>
     <button onclick="showAchievements()" style="background:none;border:none;color:#8b949e;cursor:pointer;">🏆</button>
 </div>
 
 <div id="game-layout">
     <div class="pane">
         <div class="pane-header">
-            <span>TERMINAL — cadet@vibe-station: <span id="path-display">/home</span></span>
+            <span>TERMINAL — <span id="user-display">cadet</span>@vibe-station: <span id="path-display">/home</span></span>
             <span id="status-tag" class="success">ONLINE</span>
         </div>
         <div id="output"></div>
         <div class="prompt-line">
             <span style="color:var(--prompt-color); margin-right:8px;">❯</span>
-            <input type="text" id="command-input" spellcheck="false" autocomplete="off" autofocus placeholder="Type command... (Tab to autocomplete)">
+            <input type="text" id="command-input" spellcheck="false" autocomplete="off" placeholder="Tab to complete...">
         </div>
     </div>
 
     <div id="code-pane" class="pane">
-        <div class="pane-header">ACTIVE_STREAM.js <span id="code-status" style="color:#2ea043;font-size:0.7rem;">● LIVE</span></div>
+        <div class="pane-header">ACTIVE_STREAM.js <span style="color:#2ea043;font-size:0.7rem;">● LIVE</span></div>
         <div id="code-content"></div>
     </div>
 
     <div id="logs-pane" class="pane">
-        <div class="pane-header">SYSTEM TELEMETRY &amp; AGENT LOGS</div>
+        <div class="pane-header">SYSTEM TELEMETRY</div>
         <div id="log-stream"></div>
     </div>
 </div>
 
-<div id="grad-modal" class="modal">
-    <div class="modal-content">
-        <h1 style="color:var(--accent-color);">🎖️ ELITE GRADUATE</h1>
-        <h2 id="grad-name" style="color:#c9d1d9;"></h2>
-        <p style="color:#8b949e;">Terminal mastered. Logic established. Vibe confirmed.</p>
-        <button onclick="location.reload()" style="background:var(--accent-color); border:none; padding:12px 24px; font-weight:bold; border-radius:6px; cursor:pointer;">REBOOT ACADEMY</button>
-    </div>
-</div>
-
-<div id="ach-modal" class="modal">
-    <div class="modal-content">
-        <h2 style="color:var(--highlight-color);">🏆 ACHIEVEMENTS</h2>
-        <div id="ach-list" style="text-align:left; max-height:300px; overflow-y:auto;"></div>
-        <button onclick="closeModal()" style="margin-top:20px;">Close</button>
+<div id="grad-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="text-align:center;">
+        <h1 class="success">🎖️ MISSION COMPLETE</h1>
+        <p>The Escape Pod has launched. Station Delta is secure.</p>
+        <button onclick="location.reload()" style="padding:12px 24px; cursor:pointer;">REBOOT</button>
     </div>
 </div>
 
 <script>
-    // ==================== ENGINE & VFS ====================
     let cadetName = "Cadet";
     let currentPath = '/home';
     let phase = 1, lesson = 0;
     let achievements = [];
-    let sandbox = false;
 
     const vfs = {
         '/home': { type: 'dir', children: ['projects', 'README.txt'] },
+        '/home/README.txt': { type: 'file', content: 'Vibe Terminal v2.9' },
         '/home/projects': { type: 'dir', children: ['game_v1'] },
-        '/home/projects/game_v1': { type: 'dir', children: [] },
-        '/home/README.txt': { type: 'file', content: 'Vibe Terminal v2.9' }
+        '/home/projects/game_v1': { type: 'dir', children: [] }
     };
 
     const phases = [
         null,
-        { title: "Navigation", lola: "Welcome to the station. Explore the filesystem.", objectives: [
-            { cmd: ["ls", "eza"], desc: "List files", response: "Directory listing retrieved." },
-            { cmd: ["cd projects"], desc: "Enter projects folder", response: "Navigated to projects." }
+        { title: "Navigation", lola: "Systems are cold. Move into the projects folder.", objectives: [
+            { cmd: ["ls", "eza"], desc: "List files to see your surroundings", response: "Directory listing retrieved." },
+            { cmd: ["cd projects"], desc: "Enter the 'projects' directory", response: "Navigated to /home/projects." }
         ]},
-        { title: "Project Init", lola: "Let's set up the workspace.", objectives: [
-            { cmd: ["cd game_v1"], desc: "Enter game_v1", response: "Inside workspace." },
-            { cmd: ["git init"], desc: "Initialize Git", response: "Repo initialized." }
+        { title: "Deep Dive", lola: "Go deeper. Enter the game folder.", objectives: [
+            { cmd: ["cd game_v1"], desc: "Enter 'game_v1'", response: "Inside the workspace." }
         ]},
-        { title: "The Build", lola: "Time to trigger the Agent build.", objectives: [
-            { cmd: ["vibe build"], desc: "Run vibe build", response: "Build sequence started..." }
+        { title: "Version Control", lola: "Initialize Git to track our mission progress.", objectives: [
+            { cmd: ["git init"], desc: "Type 'git init' to start tracking", response: "Git repository initialized." }
+        ]},
+        { title: "Dependency Sync", lola: "Use Bun to install the necessary tools.", objectives: [
+            { cmd: ["bun install"], desc: "Type 'bun install' to sync dependencies", response: "Packages synced via Bun." }
+        ]},
+        { title: "Agent Hire", lola: "The Engineer is offline. Hire a new one.", objectives: [
+            { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create a Specialist named Engineer", response: "Engineer is now ACTIVE." }
+        ]},
+        { title: "Networking", lola: "Initialize the Manager to coordinate the build.", objectives: [
+            { cmd: ["vibe create --role manager --name Captain"], desc: "Create a Manager named Captain", response: "Captain is now ACTIVE." }
+        ]},
+        { title: "Prompting", lola: "Ask the Captain about the mission status.", objectives: [
+            { cmd: ["prompt agent Captain"], desc: "Prompt the Captain for a status report", response: "Captain: We are ready for takeoff." }
+        ]},
+        { title: "The Launch", lola: "It's time. Build the escape pod module.", objectives: [
+            { cmd: ["vibe build"], desc: "Run 'vibe build' to start the code stream", response: "Final build sequence initiated..." }
         ]}
     ];
 
-    // ==================== SYNTAX HIGHLIGHTING ====================
     function highlight(code) {
-        return code
-            .replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
-            .replace(/\b(import|const|new|export|from|await|async|function|return|if|else)\b/g, '<span class="kw">$1</span>')
+        return code.replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
+            .replace(/\b(import|const|new|export|from|await|async|function|return|let|class)\b/g, '<span class="kw">$1</span>')
             .replace(/(['"`])(.*?)\1/g, '<span class="str">$1$2$1</span>')
             .replace(/\b(\w+)(?=\()/g, '<span class="fn">$1</span>');
     }
 
-    // ==================== TAB COMPLETION ====================
-    function handleTab(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const val = e.target.value.trim();
-            const parts = val.split(' ');
-            if (parts.length < 2) return;
-
-            const cmd = parts[0];
-            const partial = parts[parts.length - 1];
-            const currentChildren = vfs[currentPath].children || [];
-            
-            const match = currentChildren.find(c => c.startsWith(partial));
-            if (match) {
-                parts[parts.length - 1] = match;
-                e.target.value = parts.join(' ');
-                sysLog(`Auto-completed: ${match}`);
-            }
-        }
-    }
-
-    // ==================== CORE LOGIC ====================
     function log(text, type = '') {
         const entry = document.createElement('div');
         entry.className = type;
         if (type === 'lola') entry.innerHTML = `<span class="lola">L.O.L.A.: </span>${text}`;
         else if (type === 'success') entry.innerHTML = `<span class="success">${text}</span>`;
+        else if (type === 'highlight') entry.innerHTML = `<span class="highlight">MISSION: </span>${text}`;
         else entry.textContent = text;
         document.getElementById('output').insertBefore(entry, output.firstChild);
     }
@@ -237,48 +193,35 @@
         const entry = document.createElement('div');
         entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
         document.getElementById('log-stream').appendChild(entry);
-        document.getElementById('log-stream').scrollTop = logStream.scrollHeight;
+        document.getElementById('log-stream').scrollTop = 9999;
+    }
+
+    function handleTab(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const val = e.target.value.trim().split(' ');
+            const last = val[val.length - 1];
+            const match = vfs[currentPath]?.children?.find(i => i.startsWith(last));
+            if (match) { val[val.length - 1] = match; e.target.value = val.join(' '); }
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('path-display').textContent = currentPath;
+        document.getElementById('phase-label').textContent = `PHASE ${phase}/8`;
+        document.getElementById('progress-fill').style.width = `${((phase - 1) / 7) * 100}%`;
     }
 
     function streamCode() {
-        const snippet = [
-            "// AI Crew is constructing...",
-            "import { Pilot } from 'vibe-os';",
-            "const ship = new Pilot('elite');",
-            "async function launch() {",
-            "  await ship.warmup();",
-            "  return ship.takeoff();",
-            "}",
-            "launch();"
-        ];
+        const snippet = ["import { EscapePod } from 'vibe-os';", "const pod = new EscapePod();", "pod.prepareLaunch();", "pod.on('ready', () => {", "  pod.launch();", "});"];
         let i = 0;
-        const target = document.getElementById('code-content');
-        target.innerHTML = highlight("// Starting stream...\n");
+        document.getElementById('code-content').innerHTML = highlight("// Initiating build...\n");
         const interval = setInterval(() => {
-            const line = snippet[i] + "\n";
-            target.innerHTML += highlight(line);
-            target.scrollTop = target.scrollHeight;
-            sysLog(`AGENT: Building module ${i+1}...`);
+            document.getElementById('code-content').innerHTML += highlight(snippet[i] + "\n");
+            sysLog(`AGENT: Writing module ${i+1}...`);
             i++;
-            if (i >= snippet.length) {
-                clearInterval(interval);
-                log("PROJECT DEPLOYED TO CLOUD.", "success");
-                setTimeout(nextPhase, 1000);
-            }
+            if (i >= snippet.length) { clearInterval(interval); log("MISSION ACCOMPLISHED.", "success"); setTimeout(nextPhase, 1000); }
         }, 300);
-    }
-
-    function nextPhase() {
-        phase++;
-        if (phase >= phases.length) {
-            document.getElementById('grad-name').textContent = cadetName;
-            document.getElementById('grad-modal').style.display = 'flex';
-        } else {
-            lesson = 0;
-            log(`\n=== PHASE ${phase}: ${phases[phase].title} ===`, 'highlight');
-            log(phases[phase].lola, 'lola');
-            updateUI();
-        }
     }
 
     function handleCommand(raw) {
@@ -286,75 +229,82 @@
         const val = raw.trim();
         log(`❯ ${val}`, 'cmd');
 
-        // Easter Egg
-        if (val === "sudo rm -rf /") {
+        if (val.replace(/\s/g, "") === "sudorm-rf/") {
             document.body.classList.add('glitch');
-            log("CRITICAL ERROR: KERNEL DELETED", "error");
-            setTimeout(() => location.reload(), 1500);
-            return;
+            log("CRITICAL: ROOT DELETED. REBOOTING...", "error");
+            setTimeout(() => location.reload(), 1500); return;
         }
 
         const parts = val.split(' ');
         const cmd = parts[0].toLowerCase();
         const arg = parts[1];
 
-        // 1. Pro CD Logic (Absolute Paths)
-        if (cmd === 'cd') {
-            let targetPath = arg;
-            if (!arg) targetPath = '/home';
-            else if (arg === '..') targetPath = '/home';
-            else if (!arg.startsWith('/')) targetPath = `${currentPath}/${arg}`;
+        if (cmd === 'help') {
+            log(`Current Goal: ${phases[phase].objectives[lesson].desc}`, 'highlight');
+            return;
+        }
 
-            if (vfs[targetPath] && vfs[targetPath].type === 'dir') {
-                currentPath = targetPath;
-                sysLog(`CWD: ${currentPath}`);
+        // Filesystem logic with your requested cd improvement
+        if (cmd === 'ls') { 
+            log(vfs[currentPath].children.join('  ')); 
+        }
+        else if (cmd === 'cd') {
+            let target = (!arg || arg === '..') ? '/home' : (!arg.startsWith('/') ? `${currentPath}/${arg}` : arg);
+            if (vfs[target]) {
+                currentPath = target;
             } else {
-                log(`cd: no such directory: ${arg}`, 'error');
+                log(`Error: ${arg} not found`, 'error');
             }
-        } 
-        else if (cmd === 'ls') {
-            const items = vfs[currentPath].children || [];
-            log(items.length ? items.join('  ') : '(empty)');
         }
-        else if (cmd === 'vibe' && arg === 'build') {
-            if (phase === 3) streamCode();
-            else log("vibe: build locked until Phase 3", "error");
+        else if (cmd === 'vibe' && arg === 'build' && phase === 8) { 
+            streamCode(); 
+            return; 
         }
 
-        // Progress Logic
+        // Progress check
         const obj = phases[phase]?.objectives[lesson];
         if (obj && obj.cmd.some(c => val.toLowerCase().includes(c))) {
             log(obj.response, 'lola');
             lesson++;
             if (lesson >= phases[phase].objectives.length) nextPhase();
-            else log(`NEXT: ${phases[phase].objectives[lesson].desc}`, 'highlight');
+            updateUI();
+        } else if (cmd !== 'ls' && cmd !== 'cd') {
+            log(`Invalid. Objective: ${obj ? obj.desc : 'Follow the current objective'}`, 'error');
         }
+    }
 
+    function nextPhase() {
+        phase++;
+        lesson = 0;
+        if (phase > 8) document.getElementById('grad-modal').style.display = 'flex';
+        else {
+            log(`\n--- PHASE ${phase}: ${phases[phase].title} ---`, 'success');
+            log(phases[phase].lola, 'lola');
+            updateUI();
+        }
+    }
+
+    function bootAcademy() {
+        cadetName = document.getElementById('callsign-input').value || "Cadet";
+        document.getElementById('user-display').textContent = cadetName.toLowerCase();
+        document.getElementById('briefing-screen').style.display = 'none';
+        document.getElementById('game-layout').style.visibility = 'visible';
+        log(phases[1].lola, 'lola');
         updateUI();
+        sysLog("Mission Initialized. Connection Stable.");
     }
 
-    function updateUI() {
-        document.getElementById('path-display').textContent = currentPath;
-        document.getElementById('phase-label').textContent = `PHASE ${phase}/3`;
-        document.getElementById('progress-fill').style.width = `${(phase / 3) * 100}%`;
+    function showAchievements() {
+        alert("🏆 Achievements system coming in the next update!");
     }
 
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-
-    // ==================== BOOT ====================
     document.getElementById('command-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            handleCommand(e.target.value);
-            e.target.value = '';
+        if (e.key === 'Enter') { 
+            handleCommand(e.target.value); 
+            e.target.value = ''; 
         }
         handleTab(e);
     });
-
-    cadetName = prompt("Enter callsign:", "Cadet") || "Cadet";
-    log(phases[1].lola, 'lola');
-    log(`OBJECTIVE: ${phases[1].objectives[0].desc}`, 'highlight');
-    sysLog("Elite Kernel active. Tab-completion enabled.");
-    updateUI();
 </script>
 </body>
 </html>
