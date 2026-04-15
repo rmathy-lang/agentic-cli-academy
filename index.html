@@ -64,7 +64,7 @@
         .error { color: var(--error-color); }
         .success { color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); }
         .highlight { color: var(--highlight-color); font-weight: bold; }
-        .kw { color: var(--kw-color); } .str { color: var(--str-color); } .fn { color: var(--fn-color); }
+        .kw { color: var(--kw-color); } .str { color: var(--str-color); } .fn { color: var(--fn-color); } .comment { color: #6a737d; font-style: italic; }
 
         .glitch { animation: glitch 0.2s infinite; }
         @keyframes glitch { 0% { transform: translate(0); } 50% { transform: translate(-2px, 2px); background: rgba(255,0,0,0.1); } 100% { transform: translate(0); } }
@@ -72,6 +72,7 @@
 </head>
 <body onclick="document.getElementById('command-input').focus()">
 
+<!-- Briefing Screen -->
 <div id="briefing-screen" class="modal">
     <div class="modal-content">
         <h1 style="color:var(--accent-color); margin-top:0;">📡 INCOMING TRANSMISSION</h1>
@@ -91,6 +92,7 @@
     </div>
 </div>
 
+<!-- Main UI -->
 <div id="academy-bar">
     <span style="font-weight:bold; color:var(--accent-color)">VIBE_OS v2.9 • ELITE</span>
     <div style="flex:1; background:#30363d; height:4px; border-radius:2px;"><div id="progress-fill"></div></div>
@@ -122,6 +124,7 @@
     </div>
 </div>
 
+<!-- Graduation Modal -->
 <div id="grad-modal" class="modal" style="display:none;">
     <div class="modal-content" style="text-align:center;">
         <h1 class="success">🎖️ MISSION COMPLETE</h1>
@@ -131,10 +134,11 @@
 </div>
 
 <script>
+    // ==================== STATE ====================
     let cadetName = "Cadet";
     let currentPath = '/home';
-    let phase = 1, lesson = 0;
-    let achievements = [];
+    let phase = 1;
+    let lesson = 0;
 
     const vfs = {
         '/home': { type: 'dir', children: ['projects', 'README.txt'] },
@@ -143,37 +147,46 @@
         '/home/projects/game_v1': { type: 'dir', children: [] }
     };
 
+    // ==================== REFINED 8-PHASE CURRICULUM ====================
     const phases = [
         null,
-        { title: "Navigation", lola: "Systems are cold. Move into the projects folder.", objectives: [
-            { cmd: ["ls", "eza"], desc: "List files to see your surroundings", response: "Directory listing retrieved." },
+        { title: "Orientation", lola: "Systems are cold. Before we begin, you must learn to access the station's Field Manual.", objectives: [
+            { cmd: ["man", "manual"], desc: "Type 'man' to open the Field Manual", response: "Manual accessed. Authorization granted." },
+            { cmd: ["ls"], desc: "List files to see your surroundings", response: "Directory listing retrieved." },
             { cmd: ["cd projects"], desc: "Enter the 'projects' directory", response: "Navigated to /home/projects." }
         ]},
-        { title: "Deep Dive", lola: "Go deeper. Enter the game folder.", objectives: [
-            { cmd: ["cd game_v1"], desc: "Enter 'game_v1'", response: "Inside the workspace." }
+        { title: "The Workspace", lola: "Move into the active development folder.", objectives: [
+            { cmd: ["cd game_v1"], desc: "Enter 'game_v1' using 'cd game_v1'", response: "Inside the workspace." }
         ]},
-        { title: "Version Control", lola: "Initialize Git to track our mission progress.", objectives: [
+        { title: "Source Control", lola: "We need to track our changes. Initialize the repository.", objectives: [
             { cmd: ["git init"], desc: "Type 'git init' to start tracking", response: "Git repository initialized." }
         ]},
-        { title: "Dependency Sync", lola: "Use Bun to install the necessary tools.", objectives: [
-            { cmd: ["bun install"], desc: "Type 'bun install' to sync dependencies", response: "Packages synced via Bun." }
+        { title: "Dependency Sync", lola: "Sync the station's core libraries.", objectives: [
+            { cmd: ["bun install"], desc: "Run 'bun install'", response: "Packages synced via Bun." }
         ]},
-        { title: "Agent Hire", lola: "The Engineer is offline. Hire a new one.", objectives: [
-            { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create a Specialist named Engineer", response: "Engineer is now ACTIVE." }
+        { title: "Engineering", lola: "We need a Specialist to handle the mechanics.", objectives: [
+            { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create Specialist: 'vibe create --role specialist --name Engineer'", response: "Engineer is now ACTIVE." }
         ]},
-        { title: "Networking", lola: "Initialize the Manager to coordinate the build.", objectives: [
-            { cmd: ["vibe create --role manager --name Captain"], desc: "Create a Manager named Captain", response: "Captain is now ACTIVE." }
+        { title: "Command", lola: "We need a Manager to coordinate the escape.", objectives: [
+            { cmd: ["vibe create --role manager --name Captain"], desc: "Create Manager: 'vibe create --role manager --name Captain'", response: "Captain is now ACTIVE." }
         ]},
-        { title: "Prompting", lola: "Ask the Captain about the mission status.", objectives: [
-            { cmd: ["prompt agent Captain"], desc: "Prompt the Captain for a status report", response: "Captain: We are ready for takeoff." }
+        { title: "The Briefing", lola: "Talk to the Captain before we launch.", objectives: [
+            { cmd: ["prompt agent Captain"], desc: "Type 'prompt agent Captain'", response: "Captain: We are ready for the build sequence." }
         ]},
-        { title: "The Launch", lola: "It's time. Build the escape pod module.", objectives: [
-            { cmd: ["vibe build"], desc: "Run 'vibe build' to start the code stream", response: "Final build sequence initiated..." }
+        { title: "The Build", lola: "Initiate the final build of the Escape Pod.", objectives: [
+            { cmd: ["vibe build"], desc: "Run 'vibe build' to trigger the stream", response: "Final build sequence initiated..." }
         ]}
     ];
 
+    // ==================== DOM REFERENCES ====================
+    const output = document.getElementById('output');
+    const codeContent = document.getElementById('code-content');
+    const logStream = document.getElementById('log-stream');
+
+    // ==================== CORE FUNCTIONS ====================
     function highlight(code) {
-        return code.replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
+        return code
+            .replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
             .replace(/\b(import|const|new|export|from|await|async|function|return|let|class)\b/g, '<span class="kw">$1</span>')
             .replace(/(['"`])(.*?)\1/g, '<span class="str">$1$2$1</span>')
             .replace(/\b(\w+)(?=\()/g, '<span class="fn">$1</span>');
@@ -186,14 +199,15 @@
         else if (type === 'success') entry.innerHTML = `<span class="success">${text}</span>`;
         else if (type === 'highlight') entry.innerHTML = `<span class="highlight">MISSION: </span>${text}`;
         else entry.textContent = text;
-        document.getElementById('output').insertBefore(entry, output.firstChild);
+        output.insertBefore(entry, output.firstChild);
+        output.scrollTop = 0;
     }
 
     function sysLog(text) {
         const entry = document.createElement('div');
         entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
-        document.getElementById('log-stream').appendChild(entry);
-        document.getElementById('log-stream').scrollTop = 9999;
+        logStream.appendChild(entry);
+        logStream.scrollTop = logStream.scrollHeight;
     }
 
     function handleTab(e) {
@@ -202,7 +216,10 @@
             const val = e.target.value.trim().split(' ');
             const last = val[val.length - 1];
             const match = vfs[currentPath]?.children?.find(i => i.startsWith(last));
-            if (match) { val[val.length - 1] = match; e.target.value = val.join(' '); }
+            if (match) {
+                val[val.length - 1] = match;
+                e.target.value = val.join(' ');
+            }
         }
     }
 
@@ -210,74 +227,105 @@
         document.getElementById('path-display').textContent = currentPath;
         document.getElementById('phase-label').textContent = `PHASE ${phase}/8`;
         document.getElementById('progress-fill').style.width = `${((phase - 1) / 7) * 100}%`;
+        
+        const obj = phases[phase]?.objectives[lesson];
+        document.getElementById('command-input').placeholder = obj ? `Next: ${obj.desc}...` : "Type 'man' for help...";
     }
 
     function streamCode() {
-        const snippet = ["import { EscapePod } from 'vibe-os';", "const pod = new EscapePod();", "pod.prepareLaunch();", "pod.on('ready', () => {", "  pod.launch();", "});"];
+        const snippet = [
+            "import { EscapePod } from 'vibe-os';",
+            "const pod = new EscapePod();",
+            "pod.prepareLaunch();",
+            "pod.on('ready', () => {",
+            "  pod.launch();",
+            "});"
+        ];
         let i = 0;
-        document.getElementById('code-content').innerHTML = highlight("// Initiating build...\n");
+        codeContent.innerHTML = highlight("// Initiating build...\n");
         const interval = setInterval(() => {
-            document.getElementById('code-content').innerHTML += highlight(snippet[i] + "\n");
+            codeContent.innerHTML += highlight(snippet[i] + "\n");
             sysLog(`AGENT: Writing module ${i+1}...`);
             i++;
-            if (i >= snippet.length) { clearInterval(interval); log("MISSION ACCOMPLISHED.", "success"); setTimeout(nextPhase, 1000); }
+            if (i >= snippet.length) {
+                clearInterval(interval);
+                log("MISSION ACCOMPLISHED.", "success");
+                setTimeout(nextPhase, 1000);
+            }
         }, 300);
     }
 
     function handleCommand(raw) {
         if (!raw.trim()) return;
         const val = raw.trim();
+        const parts = val.split(' ');
+        const cmd = parts[0].toLowerCase();
+        const arg = parts[1];
+
         log(`❯ ${val}`, 'cmd');
 
+        // 1. THE MANUAL COMMAND
+        if (cmd === 'man' || cmd === 'manual' || cmd === 'help') {
+            log("=== VIBE_OS FIELD MANUAL ===", "highlight");
+            log("- NAVIGATION: 'ls' (list), 'cd [folder]' (move)");
+            log("- SYSTEM: 'vibe', 'git', 'bun'");
+            log("- AGENTS: 'vibe create --role [role] --name [name]'");
+            log("- TALK: 'prompt agent [name]'");
+            log(`- CURRENT TASK: ${phases[phase].objectives[lesson].desc}`, "success");
+            checkObjective(val);
+            return;
+        }
+
+        // 2. SUDO EASTER EGG
         if (val.replace(/\s/g, "") === "sudorm-rf/") {
             document.body.classList.add('glitch');
             log("CRITICAL: ROOT DELETED. REBOOTING...", "error");
             setTimeout(() => location.reload(), 1500); return;
         }
 
-        const parts = val.split(' ');
-        const cmd = parts[0].toLowerCase();
-        const arg = parts[1];
-
-        if (cmd === 'help') {
-            log(`Current Goal: ${phases[phase].objectives[lesson].desc}`, 'highlight');
+        // 3. NAVIGATION LOGIC
+        if (cmd === 'ls') {
+            log(vfs[currentPath].children.join('  '));
+        } else if (cmd === 'cd') {
+            let target = (!arg || arg === '..') ? '/home' : (!arg.startsWith('/') ? `${currentPath}/${arg}` : arg);
+            if (vfs[target]) { 
+                currentPath = target; 
+                sysLog(`CWD changed to ${currentPath}`);
+            } else { 
+                log(`Error: ${arg} not found`, 'error'); 
+            }
+        } 
+        
+        // 4. THE BUILD CLIMAX
+        else if (cmd === 'vibe' && arg === 'build' && phase === 8) {
+            streamCode();
             return;
         }
 
-        // Filesystem logic with your requested cd improvement
-        if (cmd === 'ls') { 
-            log(vfs[currentPath].children.join('  ')); 
-        }
-        else if (cmd === 'cd') {
-            let target = (!arg || arg === '..') ? '/home' : (!arg.startsWith('/') ? `${currentPath}/${arg}` : arg);
-            if (vfs[target]) {
-                currentPath = target;
-            } else {
-                log(`Error: ${arg} not found`, 'error');
-            }
-        }
-        else if (cmd === 'vibe' && arg === 'build' && phase === 8) { 
-            streamCode(); 
-            return; 
-        }
+        // 5. PROGRESSION CHECK
+        checkObjective(val);
+    }
 
-        // Progress check
+    function checkObjective(val) {
         const obj = phases[phase]?.objectives[lesson];
         if (obj && obj.cmd.some(c => val.toLowerCase().includes(c))) {
             log(obj.response, 'lola');
             lesson++;
-            if (lesson >= phases[phase].objectives.length) nextPhase();
+            if (lesson >= phases[phase].objectives.length) {
+                nextPhase();
+            }
             updateUI();
-        } else if (cmd !== 'ls' && cmd !== 'cd') {
-            log(`Invalid. Objective: ${obj ? obj.desc : 'Follow the current objective'}`, 'error');
+        } else if (!['ls', 'cd', 'man', 'manual', 'help'].includes(val.split(' ')[0])) {
+            log(`Invalid. Hint: Type 'man' for instructions.`, 'error');
         }
     }
 
     function nextPhase() {
         phase++;
         lesson = 0;
-        if (phase > 8) document.getElementById('grad-modal').style.display = 'flex';
-        else {
+        if (phase > 8) {
+            document.getElementById('grad-modal').style.display = 'flex';
+        } else {
             log(`\n--- PHASE ${phase}: ${phases[phase].title} ---`, 'success');
             log(phases[phase].lola, 'lola');
             updateUI();
@@ -295,13 +343,14 @@
     }
 
     function showAchievements() {
-        alert("🏆 Achievements system coming in the next update!");
+        alert("🏆 Achievements coming in the next update!");
     }
 
+    // ==================== STARTUP ====================
     document.getElementById('command-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { 
-            handleCommand(e.target.value); 
-            e.target.value = ''; 
+        if (e.key === 'Enter') {
+            handleCommand(e.target.value);
+            e.target.value = '';
         }
         handleTab(e);
     });
