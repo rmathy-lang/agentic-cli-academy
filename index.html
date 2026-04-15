@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe Cadet: Terminal Trials</title>
+    <title>Vibe Cadet: Master Command</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -12,449 +12,255 @@
             --accent-color: #2ea043;
             --error-color: #f85149;
             --highlight-color: #f0883e;
+            --agent-color: #bc8cff;
             --font-family: 'Courier New', Courier, monospace;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: #010409;
             color: var(--text-color);
             font-family: var(--font-family);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
 
-        #terminal-container {
-            width: 100%;
-            max-width: 900px;
-            height: 90vh;
-            background: rgba(0, 0, 0, 0.3);
+        #game-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            grid-template-rows: 1fr 180px;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .pane {
+            background: var(--bg-color);
             border: 1px solid #30363d;
             border-radius: 6px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
 
-        #terminal-header {
-            background-color: #161b22;
-            padding: 5px 10px;
+        .pane-header {
+            background: #161b22;
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             border-bottom: 1px solid #30363d;
-            border-radius: 6px 6px 0 0;
+            color: #8b949e;
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
-            color: #8b949e;
         }
 
-        #output {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column-reverse; /* Keeps bottom in view */
-        }
+        /* Main Terminal */
+        #main-terminal { grid-row: 1 / 2; grid-column: 1 / 2; }
+        #output { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column-reverse; }
 
-        .log-entry {
-            margin-bottom: 8px;
-            line-height: 1.4;
-            white-space: pre-wrap; /* Respects newlines */
+        /* Agent Sidebar */
+        #agent-pane { grid-row: 1 / 3; grid-column: 2 / 3; transition: opacity 0.5s; }
+        #agent-list { padding: 10px; font-size: 0.85rem; }
+        .agent-card {
+            border: 1px solid #30363d;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background: #161b22;
+            animation: fadeIn 0.5s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .prompt-line {
-            display: flex;
-            padding: 10px 15px;
-            background-color: #161b22;
-            border-top: 1px solid #30363d;
-        }
+        /* System Logs */
+        #logs-pane { grid-row: 2 / 3; grid-column: 1 / 2; }
+        #system-logs { padding: 10px; font-size: 0.8rem; color: #8b949e; overflow-y: auto; height: 100%; }
 
-        #prompt-label {
-            color: var(--prompt-color);
-            margin-right: 10px;
-            white-space: nowrap;
-        }
-
-        #command-input {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            font-family: var(--font-family);
-            font-size: 1rem;
-            outline: none;
-        }
-
-        /* Styling for different output types */
-        .system-msg { color: var(--text-color); }
-        .lola-msg { color: var(--accent-color); font-weight: bold;}
-        .lola-msg::before { content: "L.O.L.A.: "; }
-        .error-msg { color: var(--error-color); }
-        .cmd-echo { color: #8b949e; }
+        .log-entry { margin-bottom: 6px; line-height: 1.4; white-space: pre-wrap; }
+        .prompt-line { display: flex; padding: 12px; background: #161b22; border-top: 1px solid #30363d; }
+        #command-input { flex-grow: 1; background: transparent; border: none; color: var(--text-color); outline: none; font-family: var(--font-family); font-size: 1rem; }
+        
+        #prompt-label { color: var(--prompt-color); margin-right: 8px; }
+        .lola-msg { color: var(--accent-color); font-weight: bold; }
+        .agent-msg { color: var(--agent-color); }
+        .crit-msg { color: var(--error-color); font-weight: bold; }
         .highlight { color: var(--highlight-color); }
-        .help-msg { color: #8b949e; font-style: italic;}
+        .cmd-echo { color: #8b949e; }
 
-        /* Scrollbar styling */
-        #output::-webkit-scrollbar { width: 8px; }
-        #output::-webkit-scrollbar-track { background: var(--bg-color); }
-        #output::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        .hidden { opacity: 0.2; pointer-events: none; }
 
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div id="terminal-container">
-    <div id="terminal-header">
-        <span>VibeOS v0.1 - Ship Systems</span>
-        <span>Location: Herkimer Sect. / ~/home</span>
+<div id="game-container">
+    <div id="main-terminal" class="pane">
+        <div class="pane-header">
+            <span>Terminal: cadet@ss_stackoverflow</span>
+            <span id="location-display">~/home</span>
+        </div>
+        <div id="output">
+            <div id="log-anchor"></div>
+        </div>
+        <div class="prompt-line">
+            <span id="prompt-label">cadet@vibe:~$ </span>
+            <input type="text" id="command-input" autofocus autocomplete="off" spellcheck="false">
+        </div>
     </div>
-    
-    <div id="output">
-        <div id="log-anchor"></div> </div>
 
-    <div class="prompt-line">
-        <span id="prompt-label">cadet@ss_stackoverflow:~$&nbsp;</span>
-        <input type="text" id="command-input" autofocus autocomplete="off" spellcheck="false">
+    <div id="agent-pane" class="pane hidden">
+        <div class="pane-header">Crew / AI Agents</div>
+        <div id="agent-list">
+            <div id="empty-agents" style="color: #484f58; font-style: italic; padding: 10px;">Crew quarters empty. Phase 4 required.</div>
+        </div>
+    </div>
+
+    <div id="logs-pane" class="pane hidden">
+        <div class="pane-header">Ship Systems & MCP Comms</div>
+        <div id="system-logs">
+            <div class="log-entry">Waiting for system initialization...</div>
+        </div>
     </div>
 </div>
 
 <script>
     const output = document.getElementById('output');
     const input = document.getElementById('command-input');
-    const promptLabel = document.getElementById('prompt-label');
-    const logAnchor = document.getElementById('log-anchor');
+    const systemLogs = document.getElementById('system-logs');
+    const agentList = document.getElementById('agent-list');
+    const locDisplay = document.getElementById('location-display');
 
-    // --- The Virtual File System (A simplified mock) ---
-    // Represented as a nested object. Simple strings are file contents.
-    let fileSystem = {
-        'home': {
-            'README.txt': 'Welcome to VibeOS. If you see this, the simulation is working.',
-            'projects': {
-                'game_v1': {
-                    'main.js': '// Game logic goes here',
-                    'index.html': '<h1>My Cool Game</h1>',
-                    '.git': { 'HEAD': 'ref: refs/heads/main' } // Fake git folder
-                }
-            },
-            'downloads': {},
-            '.bashrc': '# Alias definitions'
-        }
-    };
-
-    let currentPath = ['home']; // Array path tracking: home/projects...
     let gameState = {
-        phase: 0, // 0: Survival, 1: Git, 2: Packages...
-        currentLesson: 0,
-        hintsUsed: 0,
-        gameComplete: false
+        phase: 1,
+        lesson: 0,
+        currentPath: ['home'],
+        agents: [],
+        fs: { 'home': { 'projects': { 'game_v1': {} }, 'README.txt': 'Welcome to the SS StackOverflow.' } }
     };
 
-    // --- Game Content: Phase Lessons, Objectives, and L.O.L.A. dialogue ---
-    const gameContent = [
+    const story = [
+        null, // Offset for 1-based indexing
         {
-            // PHASE 1: Survival
-            title: "Phase 1: The Digital Janitor",
-            welcome: "Welcome, Vibe Cadet. I am L.O.L.A., your Logical Oversight & Linguistic Assistant. You have standard-issue neural spikes, but zero command line competence. We must fix that before the ship crashes into the Syntax Error Nebula.\n\nYou are in the 'home' directory. First, we need to know what's here. In 2026, we don't use old 'ls'. We use 'eza'.",
+            title: "Phase 1: Survival",
+            lola: "Welcome, Cadet. The ship is adrift. We need to navigate the local directory. Use 'eza' to see where we are.",
             objectives: [
-                { cmd: 'eza', desc: "List files using 'eza'.", lola: "Good. 'eza' (or 'ls' on ancient systems) lets you see the files around you. Colorful, isn't it?" },
-                { cmd: 'cd projects', desc: "Change directory into 'projects'.", lola: "Navigating! You are not stationary. Useful." },
-                { cmd: 'eza', desc: "List files again inside 'projects'.", lola: "Ah, your first project: 'game_v1'. A bold name." },
-                { cmd: 'mkdir new_prototype', desc: "Create a new directory.", lola: "Expanding your digital real estate. Use 'mkdir [name]'." },
-                { cmd: 'touch notes.txt', desc: "Create an empty file.", lola: "A blank canvas. Or a blank file named notes.txt. Both are empty." },
-                { cmd: 'cat notes.txt', desc: "Read the (empty) file.", lola: "Riveting. 'cat' prints the content. Since we just created it, it's empty." }
-            ],
-            wrapup: "Phase 1 Complete. You can move, list, create, and view. You are functional. But if your AI makes a mistake, how do you undo it? Time for Git."
+                { cmd: 'eza', desc: "List files with 'eza'", response: "Good. You see 'projects' and 'README.txt'." },
+                { cmd: 'cd projects', desc: "Enter 'projects' folder", response: "Navigated. You're moving up in the world." }
+            ]
         },
         {
-            // PHASE 2: Git Basics
-            title: "Phase 2: The Save-Game Architect",
-            welcome: "We are moving. The AI agents we will eventually employ love making messes. We need a 'Save Game' system. We use **Git**.\n\nGo back to your home directory, then enter your 'projects' folder and 'game_v1'. We need to initialize this project.",
+            title: "Phase 2: Version Control",
+            lola: "If we mess up the ship's code, we need a way to go back in time. Use 'git init' inside 'game_v1'.",
             objectives: [
-                { cmd: 'cd ~', desc: "Go home (use 'cd ~' or just 'cd').", lola: "Back to safety." },
-                { cmd: 'cd projects/game_v1', desc: "Go deep into the game project.", lola: "We are deep in 'game_v1'. Notice I updated your prompt location." },
-                { cmd: 'git init', desc: "Initialize a new Git repository.", lola: "Excellent. You have activated the time-travel matrix for this folder." },
-                { cmd: 'git add .', desc: "Stage all files.", lola: "Preparing all your (virtual) hard work for the archive." },
-                { cmd: 'git commit', desc: "Commit your changes (type any message).", lola: "Checkpoint saved! You have successfully 'vibed' a save point." }
-            ],
-            wrapup: "Phase 2 Complete. You can save your state. If you crash the ship, we can reload. Now, how do we get new building blocks?"
+                { cmd: 'cd game_v1', desc: "Enter the game folder", response: "Safe inside." },
+                { cmd: 'git init', desc: "Initialize Git", response: "Temporal rift opened. Progress can now be saved." }
+            ]
         },
         {
-            // PHASE 3: Packages
-            title: "Phase 3: The Package Pilot",
-            welcome: "You cannot build everything yourself. The universe provides. For web tech, we use **Bun** (it's 2026, after all). We need to 'install' a library for your game.\n\nType 'bun install' to pretend to download libraries.",
+            title: "Phase 3: Package Management",
+            lola: "The ship's life support runs on JavaScript. We need to install dependencies using 'bun'.",
             objectives: [
-                { cmd: 'bun install', desc: "Install project dependencies.", lola: "Downloading libraries... 'bun' is fast. 'npm' or 'pnpm' are older counterparts." },
-                { cmd: 'npm run dev', desc: "Start the local development server.", lola: "Preview active! This command (often customized) spins up a local version of your app for testing." }
-            ],
-            wrapup: "Phase 3 Complete. You are connected to the interstellar network of reusable code. We are almost ready to start 'vibing' actual AI into existence."
+                { cmd: 'bun install', desc: "Install packages", response: "Dependencies synced. Ship air quality: 88%." }
+            ]
+        },
+        {
+            title: "Phase 4: Agent Orchestration",
+            lola: "Manual work is too slow. The hull is breaching. UNLOCKING AGENT PANES. Create a 'Manager' to coordinate the repairs.",
+            objectives: [
+                { cmd: 'vibe create --role manager --name Captain', desc: "Create a Manager Agent", response: "Captain is online. Look at the sidebar!" }
+            ]
+        },
+        {
+            title: "Phase 5: MCP & Recovery",
+            lola: "Final step. Connect our agents to the Star Chart via MCP to find the way home.",
+            objectives: [
+                { cmd: 'mcp connect', desc: "Connect to Star Chart", response: "Coordinates found! Sector 7G. Engaging warp drive." }
+            ]
         }
     ];
 
-    // --- Core Functions ---
+    function log(msg, type = 'system-msg', target = output) {
+        const div = document.createElement('div');
+        div.className = `log-entry ${type}`;
+        if (type === 'lola-msg') div.innerHTML = `<span class="lola-msg">L.O.L.A.: </span>${msg}`;
+        else div.textContent = msg;
 
-    function log(text, type = 'system-msg') {
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${type}`;
-        entry.textContent = text;
-        
-        // Handle L.O.L.A.'s formatting separately
-        if (type === 'lola-msg') {
-            entry.innerHTML = `<span class="lola-msg"></span>${text.replace(/\n/g, '<br>')}`;
-        }
-
-        output.insertBefore(entry, logAnchor); // Add new logs *above* the anchor
-        output.scrollTop = output.scrollHeight; // Auto-scroll to bottom
-    }
-
-    function updatePrompt() {
-        const pathString = currentPath.length > 1 ? `~/${currentPath.slice(1).join('/')}` : '~';
-        promptLabel.textContent = `cadet@ss_stackoverflow:${pathString}$ `;
-    }
-
-    // Helper to get nested file structure from current path
-    function getDir(pathArray) {
-        let dir = fileSystem;
-        for (const part of pathArray) {
-            if (dir[part]) {
-                dir = dir[part];
-            } else {
-                return null;
-            }
-        }
-        return dir;
-    }
-
-    // --- Command Parser & Simulator ---
-    function processCommand(inputLine) {
-        const tokens = inputLine.trim().split(/\s+/);
-        const cmd = tokens[0];
-        const args = tokens.slice(1);
-        const currentDir = getDir(currentPath);
-
-        log(`${promptLabel.textContent}${inputLine}`, 'cmd-echo');
-
-        // Simple commands (navigation, file ops, help)
-        if (cmd === 'help') {
-            log("Available pseudo-commands: help, clear, pwd, eza, ls, cd, mkdir, touch, cat, git, bun, npm", 'help-msg');
-            log(`Current Objectives (Phase ${gameState.phase + 1}):`, 'help-msg');
-            gameContent[gameState.phase].objectives.forEach((obj, idx) => {
-                const status = idx < gameState.currentLesson ? '[COMPLETED]' : '[OPEN]';
-                log(` - ${status} ${obj.desc}`, 'help-msg');
-            });
-            return;
-        }
-
-        if (cmd === 'clear') {
-            // Keep L.O.L.A.'s greeting but clear everything else
-            const entries = output.querySelectorAll('.log-entry');
-            entries.forEach(entry => entry.remove());
-            initPhase(gameState.phase, true); // re-print greeting
-            return;
-        }
-
-        if (cmd === 'pwd') {
-            log(`/${currentPath.join('/')}`);
-        }
-
-        else if (cmd === 'eza' || cmd === 'ls') {
-            if (cmd === 'ls') log("(Pseudo-tip: In 2026, vibe coders prefer 'eza' for colors/icons!)");
-            let outputStr = '';
-            for (const item in currentDir) {
-                if (item.startsWith('.')) continue; // Simple hidden file check
-                outputStr += `${item}   `;
-            }
-            log(outputStr);
-        }
-
-        else if (cmd === 'cd') {
-            const target = args[0];
-            if (!target || target === '~') {
-                currentPath = ['home'];
-            } else if (target === '..') {
-                if (currentPath.length > 1) currentPath.pop();
-            } else {
-                // Handle multiple path segments e.g., projects/game_v1
-                const segments = target.split('/');
-                let temporaryPath = [...currentPath];
-                let success = true;
-
-                for (const seg of segments) {
-                    if (seg === '..') {
-                        if (temporaryPath.length > 1) temporaryPath.pop();
-                    } else if (seg === '.' || seg === '') {
-                        // do nothing
-                    }
-                    else {
-                        const checkDir = getDir(temporaryPath);
-                        if (checkDir && typeof checkDir[seg] === 'object' && !Array.isArray(checkDir[seg])) {
-                            temporaryPath.push(seg);
-                        } else {
-                            log(`-bash: cd: ${target}: No such directory`, 'error-msg');
-                            success = false;
-                            break;
-                        }
-                    }
-                }
-                if (success) currentPath = temporaryPath;
-            }
-            updatePrompt();
-        }
-
-        else if (cmd === 'mkdir') {
-            const name = args[0];
-            if (name) {
-                currentDir[name] = {};
-                log(`Created virtual directory: ${name}`);
-            } else {
-                log("mkdir: missing operand", 'error-msg');
-            }
-        }
-
-        else if (cmd === 'touch') {
-            const name = args[0];
-            if (name) {
-                currentDir[name] = `Empty file created at ${new Date().toISOString()}`;
-                log(`Created virtual file: ${name}`);
-            } else {
-                log("touch: missing operand", 'error-msg');
-            }
-        }
-
-        else if (cmd === 'cat') {
-            const name = args[0];
-            if (currentDir[name]) {
-                if (typeof currentDir[name] === 'string') {
-                    log(currentDir[name]);
-                } else {
-                    log(`cat: ${name}: Is a directory`, 'error-msg');
-                }
-            } else {
-                log(`cat: ${name}: No such file`, 'error-msg');
-            }
-        }
-
-        // Simulating Phase 2/3 specific commands
-        else if (cmd === 'git') {
-            const sub = args[0];
-            if (sub === 'init') {
-                currentDir['.git'] = { 'HEAD': 'ref: refs/heads/main' };
-                log("Initialized empty Git repository in simulation.");
-            } else if (sub === 'add') {
-                log(`Staged ${args[1] || 'all'} files.`);
-            } else if (sub === 'commit') {
-                log(`[main (root-commit)] ${args[1] || 'Initial commit'} - simulated.`);
-            } else {
-                log("git: Pseudo-command requires sub-command (init, add, commit)", 'error-msg');
-            }
-        }
-
-        else if (cmd === 'bun' && args[0] === 'install') {
-            log("bun install v1.1.0");
-            log("✓ Installed 142 packages in 0.12s (simulated)");
-        }
-
-        else if (cmd === 'npm' && args[0] === 'run' && args[1] === 'dev') {
-            log("> game_v1@0.0.1 dev");
-            log("> (Simulated) Server running at http://localhost:5173/");
-        }
-
-        // Catch-all for unknown commands
-        else if (cmd !== '') {
-            log(`-bash: ${cmd}: command not found (Did you need 'help'?)`, 'error-msg');
-        }
-
-        // --- Game Logic Check: Did they complete the objective? ---
-        checkObjective(cmd, args);
-    }
-
-    // --- Progression Logic ---
-
-    function checkObjective(cmd, args) {
-        if (gameState.gameComplete) return;
-
-        const currentPhaseContent = gameContent[gameState.phase];
-        const currentObjective = currentPhaseContent.objectives[gameState.currentLesson];
-
-        if (!currentObjective) return; // Should not happen if game running
-
-        // Special handling for commands with specific arguments (like 'cd projects')
-        let objectiveMet = false;
-        if (currentObjective.cmd.includes(' ')) {
-             const objTokens = currentObjective.cmd.split(' ');
-             objectiveMet = (cmd === objTokens[0] && args[0] === objTokens[1]);
+        if (target === output) {
+            target.insertBefore(div, document.getElementById('log-anchor'));
         } else {
-             objectiveMet = (cmd === currentObjective.cmd);
+            target.appendChild(div);
+            target.scrollTop = target.scrollHeight;
+        }
+    }
+
+    function processCommand(raw) {
+        const val = raw.trim();
+        log(`cadet@vibe:~$ ${val}`, 'cmd-echo');
+        
+        const phaseData = story[gameState.phase];
+        const currentObj = phaseData.objectives[gameState.lesson];
+
+        // Simulate CD
+        if (val.startsWith('cd ')) {
+            const dest = val.split(' ')[1];
+            locDisplay.textContent = `~/home/${dest}`;
         }
 
-        if (objectiveMet) {
-            log(currentObjective.lola, 'lola-msg');
-            gameState.currentLesson++;
+        // Logic check
+        if (val === currentObj.cmd || (val.startsWith('vibe create') && gameState.phase === 4)) {
+            log(currentObj.response, 'lola-msg');
+            
+            if (gameState.phase === 4) {
+                document.getElementById('agent-pane').classList.remove('hidden');
+                document.getElementById('logs-pane').classList.remove('hidden');
+                addAgent('Manager', 'Captain');
+            }
 
-            // Is the Phase Complete?
-            if (gameState.currentLesson >= currentPhaseContent.objectives.length) {
-                log(`*** ${currentPhaseContent.wrapup} ***`, 'system-msg');
-                log("-----------------------------------------", 'system-msg');
+            gameState.lesson++;
+            if (gameState.lesson >= phaseData.objectives.length) {
                 gameState.phase++;
-                gameState.currentLesson = 0;
-
-                // Is the Game Complete?
-                if (gameState.phase >= gameContent.length) {
-                    endGame();
-                } else {
-                    // Next phase
-                    setTimeout(() => initPhase(gameState.phase), 1000);
-                }
+                gameState.lesson = 0;
+                if (gameState.phase < story.length) setTimeout(initPhase, 1000);
+                else log("MISSION COMPLETE. WE ARE GOING HOME.", "highlight");
+            } else {
+                log(`NEXT: ${phaseData.objectives[gameState.lesson].desc}`, "highlight");
             }
+        } else {
+            log(`Hint: Try '${currentObj.cmd}'`, 'error-msg');
         }
     }
 
-    function initPhase(phaseIndex, skipGreeting=false) {
-        if (!gameContent[phaseIndex]) return;
-
-        const content = gameContent[phaseIndex];
-        if (!skipGreeting) {
-            log(`\n=== ${content.title.toUpperCase()} ===`, 'system-msg');
-            log(content.welcome, 'lola-msg');
-        }
-        log(`NEXT OBJECTIVE: ${content.objectives[0].desc}`, 'highlight');
+    function addAgent(role, name) {
+        document.getElementById('empty-agents').style.display = 'none';
+        const card = document.createElement('div');
+        card.className = 'agent-card';
+        card.innerHTML = `<strong>${name}</strong><br><small>${role}</small><br><span style="color:var(--accent-color)">● ONLINE</span>`;
+        agentList.appendChild(card);
+        log(`[SYSTEM] Agent ${name} assigned to Ship Logic.`, 'agent-msg', systemLogs);
     }
 
-    function endGame() {
-        gameState.gameComplete = true;
-        log("\n=========================================", 'system-msg');
-        log("VICTORY! VIBE CADET STATUS: CONFIRMED.", 'system-msg');
-        log("You have the functional knowledge to move around, save your state with Git, install packages, and navigate a Unix-like file system.", 'system-msg');
-        log("L.O.L.A.: Your brain waves show acceptable comprehension. The SS StackOverflow will not crash today. You may now commence actual high-vibe coding in the real world.", 'lola-msg');
-        log("Input is disabled. You are free.", 'system-msg');
-        input.disabled = true;
-        input.placeholder = "Simulation Complete.";
+    function initPhase() {
+        const p = story[gameState.phase];
+        log(`\n=== ${p.title} ===`, 'highlight');
+        log(p.lola, 'lola-msg');
+        log(`OBJECTIVE: ${p.objectives[0].desc}`, 'highlight');
     }
 
-    // --- Event Listeners ---
     input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const command = input.value;
-            if (command.trim() !== "") {
-                processCommand(command);
-            }
+        if (e.key === 'Enter' && input.value) {
+            processCommand(input.value);
             input.value = '';
         }
     });
 
-    // Handle clicking anywhere on the terminal focusing the input
-    document.getElementById('terminal-container').addEventListener('click', () => {
-        input.focus();
-    });
-
-    // --- Start the Game! ---
     log("VibeOS Booting...", 'system-msg');
-    log("Neural Link Established.", 'system-msg');
-    updatePrompt();
-    setTimeout(() => initPhase(0), 500);
-
+    setTimeout(initPhase, 500);
 </script>
 </body>
 </html>
