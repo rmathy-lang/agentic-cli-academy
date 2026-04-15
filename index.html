@@ -72,7 +72,6 @@
 </head>
 <body onclick="document.getElementById('command-input').focus()">
 
-<!-- Briefing Screen -->
 <div id="briefing-screen" class="modal">
     <div class="modal-content">
         <h1 style="color:var(--accent-color); margin-top:0;">📡 INCOMING TRANSMISSION</h1>
@@ -92,7 +91,6 @@
     </div>
 </div>
 
-<!-- Main UI -->
 <div id="academy-bar">
     <span style="font-weight:bold; color:var(--accent-color)">VIBE_OS v2.9 • ELITE</span>
     <div style="flex:1; background:#30363d; height:4px; border-radius:2px;"><div id="progress-fill"></div></div>
@@ -124,7 +122,6 @@
     </div>
 </div>
 
-<!-- Graduation Modal -->
 <div id="grad-modal" class="modal" style="display:none;">
     <div class="modal-content" style="text-align:center;">
         <h1 class="success">🎖️ MISSION COMPLETE</h1>
@@ -134,11 +131,9 @@
 </div>
 
 <script>
-    // ==================== STATE ====================
     let cadetName = "Cadet";
     let currentPath = '/home';
-    let phase = 1;
-    let lesson = 0;
+    let phase = 1, lesson = 0;
 
     const vfs = {
         '/home': { type: 'dir', children: ['projects', 'README.txt'] },
@@ -147,7 +142,6 @@
         '/home/projects/game_v1': { type: 'dir', children: [] }
     };
 
-    // ==================== REFINED 8-PHASE CURRICULUM ====================
     const phases = [
         null,
         { title: "Orientation", lola: "Systems are cold. Before we begin, you must learn to access the station's Field Manual.", objectives: [
@@ -178,15 +172,8 @@
         ]}
     ];
 
-    // ==================== DOM REFERENCES ====================
-    const output = document.getElementById('output');
-    const codeContent = document.getElementById('code-content');
-    const logStream = document.getElementById('log-stream');
-
-    // ==================== CORE FUNCTIONS ====================
     function highlight(code) {
-        return code
-            .replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
+        return code.replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
             .replace(/\b(import|const|new|export|from|await|async|function|return|let|class)\b/g, '<span class="kw">$1</span>')
             .replace(/(['"`])(.*?)\1/g, '<span class="str">$1$2$1</span>')
             .replace(/\b(\w+)(?=\()/g, '<span class="fn">$1</span>');
@@ -199,15 +186,14 @@
         else if (type === 'success') entry.innerHTML = `<span class="success">${text}</span>`;
         else if (type === 'highlight') entry.innerHTML = `<span class="highlight">MISSION: </span>${text}`;
         else entry.textContent = text;
-        output.insertBefore(entry, output.firstChild);
-        output.scrollTop = 0;
+        document.getElementById('output').insertBefore(entry, output.firstChild);
     }
 
     function sysLog(text) {
         const entry = document.createElement('div');
         entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
-        logStream.appendChild(entry);
-        logStream.scrollTop = logStream.scrollHeight;
+        document.getElementById('log-stream').appendChild(entry);
+        document.getElementById('log-stream').scrollTop = 9999;
     }
 
     function handleTab(e) {
@@ -216,10 +202,7 @@
             const val = e.target.value.trim().split(' ');
             const last = val[val.length - 1];
             const match = vfs[currentPath]?.children?.find(i => i.startsWith(last));
-            if (match) {
-                val[val.length - 1] = match;
-                e.target.value = val.join(' ');
-            }
+            if (match) { val[val.length - 1] = match; e.target.value = val.join(' '); }
         }
     }
 
@@ -233,25 +216,14 @@
     }
 
     function streamCode() {
-        const snippet = [
-            "import { EscapePod } from 'vibe-os';",
-            "const pod = new EscapePod();",
-            "pod.prepareLaunch();",
-            "pod.on('ready', () => {",
-            "  pod.launch();",
-            "});"
-        ];
+        const snippet = ["import { EscapePod } from 'vibe-os';", "const pod = new EscapePod();", "pod.prepareLaunch();", "pod.on('ready', () => {", "  pod.launch();", "});"];
         let i = 0;
-        codeContent.innerHTML = highlight("// Initiating build...\n");
+        document.getElementById('code-content').innerHTML = highlight("// Initiating build...\n");
         const interval = setInterval(() => {
-            codeContent.innerHTML += highlight(snippet[i] + "\n");
+            document.getElementById('code-content').innerHTML += highlight(snippet[i] + "\n");
             sysLog(`AGENT: Writing module ${i+1}...`);
             i++;
-            if (i >= snippet.length) {
-                clearInterval(interval);
-                log("MISSION ACCOMPLISHED.", "success");
-                setTimeout(nextPhase, 1000);
-            }
+            if (i >= snippet.length) { clearInterval(interval); log("MISSION ACCOMPLISHED.", "success"); setTimeout(nextPhase, 1000); }
         }, 300);
     }
 
@@ -264,58 +236,57 @@
 
         log(`❯ ${val}`, 'cmd');
 
-        // 1. THE MANUAL COMMAND
-        if (cmd === 'man' || cmd === 'manual' || cmd === 'help') {
-            log("=== VIBE_OS FIELD MANUAL ===", "highlight");
-            log("- NAVIGATION: 'ls' (list), 'cd [folder]' (move)");
-            log("- SYSTEM: 'vibe', 'git', 'bun'");
-            log("- AGENTS: 'vibe create --role [role] --name [name]'");
-            log("- TALK: 'prompt agent [name]'");
-            log(`- CURRENT TASK: ${phases[phase].objectives[lesson].desc}`, "success");
-            checkObjective(val);
-            return;
-        }
-
-        // 2. SUDO EASTER EGG
         if (val.replace(/\s/g, "") === "sudorm-rf/") {
             document.body.classList.add('glitch');
             log("CRITICAL: ROOT DELETED. REBOOTING...", "error");
             setTimeout(() => location.reload(), 1500); return;
         }
 
-        // 3. NAVIGATION LOGIC
+        if (cmd === 'help' || cmd === 'man' || cmd === 'manual') {
+            log("=== VIBE_OS FIELD MANUAL ===", "highlight");
+            log("- NAVIGATION: 'ls' (list), 'cd [folder]' (move)");
+            log("- SYSTEM: 'vibe', 'git', 'bun'");
+            log("- AGENTS: 'vibe create --role [role] --name [name]'");
+            log("- TALK: 'prompt agent [name]'");
+            log(`- CURRENT TASK: ${phases[phase].objectives[lesson].desc}`, "success");
+            return;
+        }
+
         if (cmd === 'ls') {
             log(vfs[currentPath].children.join('  '));
         } else if (cmd === 'cd') {
             let target = (!arg || arg === '..') ? '/home' : (!arg.startsWith('/') ? `${currentPath}/${arg}` : arg);
-            if (vfs[target]) { 
-                currentPath = target; 
-                sysLog(`CWD changed to ${currentPath}`);
-            } else { 
-                log(`Error: ${arg} not found`, 'error'); 
-            }
-        } 
-        
-        // 4. THE BUILD CLIMAX
-        else if (cmd === 'vibe' && arg === 'build' && phase === 8) {
+            if (vfs[target]) currentPath = target; else log(`Error: ${arg} not found`, 'error');
+        } else if (cmd === 'vibe' && arg === 'build' && phase === 8) {
             streamCode();
             return;
         }
 
-        // 5. PROGRESSION CHECK
-        checkObjective(val);
-    }
-
-    function checkObjective(val) {
+        // PROGRESS CHECK - now more flexible for vibe create commands
         const obj = phases[phase]?.objectives[lesson];
-        if (obj && obj.cmd.some(c => val.toLowerCase().includes(c))) {
-            log(obj.response, 'lola');
-            lesson++;
-            if (lesson >= phases[phase].objectives.length) {
-                nextPhase();
+        if (obj) {
+            const lowerVal = val.toLowerCase();
+            let matched = false;
+
+            if (lowerVal.includes("vibe create") && lowerVal.includes("role") && lowerVal.includes("name")) {
+                matched = true; // Flexible match for any vibe create command
+            } else if (obj.cmd.some(c => lowerVal.includes(c))) {
+                matched = true;
             }
-            updateUI();
-        } else if (!['ls', 'cd', 'man', 'manual', 'help'].includes(val.split(' ')[0])) {
+
+            if (matched) {
+                log(obj.response, 'lola');
+                lesson++;
+                if (lesson >= phases[phase].objectives.length) {
+                    nextPhase();
+                } else {
+                    updateUI();
+                }
+                return;
+            }
+        }
+
+        if (cmd !== 'ls' && cmd !== 'cd') {
             log(`Invalid. Hint: Type 'man' for instructions.`, 'error');
         }
     }
@@ -346,11 +317,10 @@
         alert("🏆 Achievements coming in the next update!");
     }
 
-    // ==================== STARTUP ====================
     document.getElementById('command-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            handleCommand(e.target.value);
-            e.target.value = '';
+        if (e.key === 'Enter') { 
+            handleCommand(e.target.value); 
+            e.target.value = ''; 
         }
         handleTab(e);
     });
