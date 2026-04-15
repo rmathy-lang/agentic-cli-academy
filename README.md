@@ -8,7 +8,7 @@
 Originally a simple CLI tutor, this "Elite Edition" has been re-architected into a narrative-driven training environment where students must restore a compromised space station by orchestrating autonomous AI agents.
 
 ## 🚀 Live Demo
-**[Play Vibe Cadet Academy on GitHub Pages](https://github.com/rmathy-lang/agentic-cli-academy)**
+**[Play Vibe Cadet Academy on GitHub Pages](https://github.io/rmathy-lang/agentic-cli-academy)**
 
 ---
 
