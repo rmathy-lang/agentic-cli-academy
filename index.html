@@ -175,7 +175,24 @@
         }
     ] 
 },
-        { title: "LLM Reasoning", lola: "Now, let's ask the AI to explain those logs. Pipe the logs into our reasoning tool: **'cat logs.txt | vibe explain'**", objectives: [{ cmd: ["cat logs.txt | vibe explain"], desc: "Pipe logs to vibe explain", response: "PID 1337!", explanation: "Using an LLM to filter terminal output is a core part of modern AI automation." }] },
+       { 
+    title: "Contextual Grounding", 
+    lola: "Great, we have the 'CRITICAL' errors. But an AI agent is only as smart as the context you give it. We need to **ground** the agent by piping those specific errors into the reasoning engine.", 
+    objectives: [
+        { 
+            cmd: ["cat logs.txt | grep CRITICAL | vibe explain"], 
+            desc: "Pipe filtered logs to 'vibe explain'", 
+            response: "Analysis complete: The AI identifies a hardware conflict in Sector 7.", 
+            explanation: "This is 'Grounding.' By filtering the data *before* it hits the AI, you prevent 'Hallucination' and save on processing costs (tokens)." 
+        },
+        { 
+            cmd: ["vibe explain --json"], 
+            desc: "Format the explanation as JSON", 
+            response: '{"issue": "Sector 7 Conflict", "severity": "High"}', 
+            explanation: "JSON (JavaScript Object Notation) is how AI agents talk to other machines. It turns a conversational 'vibe' into a predictable data structure." 
+        }
+    ] 
+}
         { title: "Structured Info", lola: "AI agents communicate best with clean data. Add the **'--json'** flag to get a computer-readable explanation. Type: **'vibe explain --json'**", objectives: [{ cmd: ["vibe explain --json"], desc: "Add the --json flag", response: '{"target": "1337"}', explanation: "JSON is the universal language of the internet." }] },
         { title: "Prompt Governance", lola: "Our AI is hallucinating. We need to edit the **System Prompt**. Type: **'vibe prompt --edit'**", objectives: [{ cmd: ["vibe prompt --edit"], desc: "Type 'vibe prompt --edit'", response: "Fixed.", explanation: "A System Prompt is the personality and rules you give an AI to keep it on track." }] },
         { title: "Detection", lola: "A rogue agent is running. Use **'ps'** (Process Status) to see all active computer tasks.", objectives: [{ cmd: ["ps"], desc: "Type 'ps'", response: "Found.", explanation: "'ps' shows you everything currently alive in the computer." }] },
