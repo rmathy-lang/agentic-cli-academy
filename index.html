@@ -126,33 +126,32 @@
     const phases = [
         null,
         { title: "Orientation", lola: "Systems are cold. Let's learn to see where we are.", objectives: [
-            { cmd: ["ls"], desc: "Type ls to list files", response: "Directory contents listed.", explanation: "ls shows you everything in the current folder. Real developers use this constantly to know what's around them." },
-            { cmd: ["pwd"], desc: "Type pwd to see current location", response: "Current path displayed.", explanation: "pwd = Print Working Directory. It answers 'where am I?' — super useful when you're lost in a big project." },
-            { cmd: ["cat README.txt"], desc: "Type cat README.txt", response: "File read.", explanation: "cat lets you read files directly in the terminal. No need for a text editor just to peek inside." }
+            { cmd: ["ls"], desc: "Type ls to list files", response: "Directory contents listed.", explanation: "ls shows you everything in the current folder. Real developers use this constantly." },
+            { cmd: ["pwd"], desc: "Type pwd to see current location", response: "Current path displayed.", explanation: "pwd = Print Working Directory. It answers 'where am I?'" },
+            { cmd: ["cat README.txt"], desc: "Type cat README.txt", response: "File read.", explanation: "cat lets you read files directly in the terminal." }
         ]},
         { title: "Navigation", lola: "Time to move around the station.", objectives: [
-            { cmd: ["cd projects"], desc: "cd into projects", response: "Navigated to projects.", explanation: "cd changes your current directory. You will use this every single day as a developer." },
-            { cmd: ["cd game_v1"], desc: "cd into game_v1", response: "Now inside the workspace.", explanation: "You can chain navigation commands. Real projects have many nested folders." }
+            { cmd: ["cd projects"], desc: "cd into projects", response: "Navigated to projects.", explanation: "cd changes your current directory." },
+            { cmd: ["cd game_v1"], desc: "cd into game_v1", response: "Now inside the workspace.", explanation: "You can chain navigation commands to go deep into projects." }
         ]},
         { title: "Creation", lola: "Let's build something.", objectives: [
-            { cmd: ["mkdir backup"], desc: "mkdir backup", response: "Backup folder created.", explanation: "mkdir creates new directories. Organizing files is a core skill." },
-            { cmd: ["touch log.txt"], desc: "touch log.txt", response: "File created.", explanation: "touch quickly creates empty files — perfect for starting new notes or scripts." }
+            { cmd: ["mkdir backup"], desc: "mkdir backup", response: "Backup folder created.", explanation: "mkdir creates new directories. Organization is key." },
+            { cmd: ["touch log.txt"], desc: "touch log.txt", response: "File created.", explanation: "touch quickly creates empty files." }
         ]},
         { title: "Source Control", lola: "We need memory. Initialize git.", objectives: [
-            { cmd: ["git init"], desc: "git init", response: "Repository initialized.", explanation: "git init creates a hidden folder that remembers every change you make." },
-            { cmd: ["git status"], desc: "git status", response: "Status checked.", explanation: "git status shows you what changed. Developers check this constantly." }
+            { cmd: ["git init"], desc: "git init", response: "Repository initialized.", explanation: "git init creates a hidden folder that remembers every change." }
         ]},
         { title: "Dependency Sync", lola: "Sync the core libraries.", objectives: [
-            { cmd: ["bun install"], desc: "bun install", response: "Packages synced.", explanation: "Modern package managers like Bun/npm install libraries your project needs." }
+            { cmd: ["bun install"], desc: "bun install", response: "Packages synced.", explanation: "Package managers like Bun install libraries your project needs." }
         ]},
         { title: "Engineering", lola: "Create the Engineer specialist.", objectives: [
-            { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create Engineer", response: "Engineer is now ACTIVE.", explanation: "This is a station-specific command, but it mirrors how real teams assign roles and responsibilities." }
+            { cmd: ["vibe create"], desc: "vibe create --role specialist --name Engineer", response: "Engineer is now ACTIVE.", explanation: "Automation agents help you scale your work." }
         ]},
         { title: "Command", lola: "Create the Captain.", objectives: [
-            { cmd: ["vibe create --role manager --name Captain"], desc: "Create Captain", response: "Captain is now ACTIVE.", explanation: "Same pattern as before — you’re learning how to manage multiple agents via CLI." }
+            { cmd: ["vibe create"], desc: "vibe create --role manager --name Captain", response: "Captain is now ACTIVE.", explanation: "Managers coordinate multiple agents." }
         ]},
         { title: "Launch", lola: "Final build sequence.", objectives: [
-            { cmd: ["vibe build"], desc: "vibe build", response: "Build initiated...", explanation: "In real life this is like running npm run build or cargo build — it packages everything for deployment." }
+            { cmd: ["vibe build"], desc: "vibe build", response: "Build initiated...", explanation: "The build process packages your code for the real world." }
         ]}
     ];
 
@@ -200,7 +199,7 @@
             if (i >= snippet.length) {
                 clearInterval(interval);
                 log("MISSION ACCOMPLISHED. Escape Pod launched.", "success");
-                setTimeout(nextPhase, 800);
+                setTimeout(nextPhase, 1500);
             }
         }, 280);
     }
@@ -209,15 +208,13 @@
         if (!raw.trim()) return;
         const val = raw.trim();
         commandHistory.unshift(val);
-        if (commandHistory.length > 50) commandHistory.pop();
         historyIndex = -1;
 
         log(`❯ ${val}`);
-
         const parts = val.split(' ');
         const cmd = parts[0].toLowerCase();
 
-        // Easter egg
+        // 1. EASTER EGG
         if (val.replace(/\s/g, "") === "sudorm-rf/") {
             document.body.classList.add('glitch');
             log("CRITICAL ERROR: ROOT DELETED", "error");
@@ -225,7 +222,7 @@
             return;
         }
 
-        // Help / man
+        // 2. HELP SYSTEM
         if (cmd === 'man' || cmd === 'help') {
             const target = parts[1] || 'general';
             if (helpDB[target]) {
@@ -240,80 +237,54 @@
             return;
         }
 
-        // Basic commands
-        if (cmd === 'ls') {
-            log(vfs[currentPath].children.join('  '));
-            return;
+        // 3. OBJECTIVE CHECK (Do this before standard command execution)
+        const obj = phases[phase]?.objectives[lesson];
+        let matched = false;
+        if (obj && obj.cmd.some(c => val.toLowerCase().includes(c.toLowerCase()))) {
+            matched = true;
         }
-        if (cmd === 'pwd') {
-            log(currentPath);
-            return;
-        }
-        if (cmd === 'cat' && parts[1]) {
-            const filePath = currentPath + '/' + parts[1];
+
+        // 4. STANDARD TERMINAL EMULATION
+        if (cmd === 'ls') log(vfs[currentPath].children.join('  '));
+        else if (cmd === 'pwd') log(currentPath);
+        else if (cmd === 'cat' && parts[1]) {
+            const filePath = (currentPath === '/' ? '' : currentPath) + '/' + parts[1];
             if (vfs[filePath]) log(vfs[filePath].content);
             else log("File not found", "error");
-            return;
         }
-        if (cmd === 'cd') {
-            let target = (!parts[1] || parts[1] === '..') ? '/home' : (parts[1].startsWith('/') ? parts[1] : `${currentPath}/${parts[1]}`);
-            if (vfs[target]) { currentPath = target; log(`Moved to ${currentPath}`); }
+        else if (cmd === 'cd') {
+            let target = (!parts[1] || parts[1] === '..') ? '/home' : (parts[1].startsWith('/') ? parts[1] : (currentPath === '/' ? '' : currentPath) + '/' + parts[1]);
+            if (vfs[target]) { currentPath = target; log(`Moved to ${currentPath}`); updateUI(); }
             else log(`No such directory: ${parts[1]}`, "error");
-            updateUI();
-            return;
         }
-        if (cmd === 'mkdir' && parts[1]) {
-            log(`Directory '${parts[1]}' created (simulated).`);
-            return;
-        }
-        if (cmd === 'touch' && parts[1]) {
-            log(`File '${parts[1]}' created (simulated).`);
-            return;
-        }
-        if (cmd === 'git' && parts[1] === 'init') {
-            log("Repository initialized.");
-            return;
-        }
-        if (cmd === 'git' && parts[1] === 'status') {
-            log("On branch main. Nothing to commit.");
-            return;
-        }
-        if (cmd === 'vibe' && parts[1] === 'build' && phase === 8) {
+        else if (cmd === 'vibe' && parts[1] === 'build' && phase === 8) {
             streamCode();
             return;
         }
 
-        // Progress check with explanation
-        const obj = phases[phase]?.objectives[lesson];
-        if (obj) {
-            let matched = false;
-            const lowerVal = val.toLowerCase();
-            if (obj.cmd.some(c => lowerVal.includes(c.toLowerCase()))) matched = true;
-            else if (lowerVal.includes("vibe create")) matched = true;
-
-            if (matched) {
-                failCount = 0;
-                log(obj.response, 'lola');
-                log(obj.explanation, 'lola');
-                lesson++;
-
-                if (lesson >= phases[phase].objectives.length) {
-                    log(`\n--- PHASE COMPLETE: ${phases[phase].title} ---`, 'success');
-                    log("Great work, Cadet. Here's what you learned:", 'debrief');
-                    setTimeout(nextPhase, 1200);
-                } else {
-                    updateUI();
-                }
-                return;
-            }
-        }
-
-        failCount++;
-        if (failCount >= 2) {
-            log(`Hint: Try typing "man ${cmd || 'ls'}" or check the current objective.`, 'highlight');
+        // 5. PROGRESSION LOGIC
+        if (matched) {
             failCount = 0;
-        } else {
-            log("Command not recognized for this phase. Type 'man' for help.", "error");
+            log(obj.response, 'lola');
+            log(obj.explanation, 'debrief'); // Use the debrief styling for the "Why"
+            lesson++;
+
+            if (lesson >= phases[phase].objectives.length) {
+                setTimeout(() => {
+                    log(`\n--- PHASE COMPLETE: ${phases[phase].title} ---`, 'success');
+                    setTimeout(nextPhase, 1000);
+                }, 500);
+            } else {
+                updateUI();
+            }
+        } else if (!['ls','cd','pwd','cat','man','help'].includes(cmd)) {
+            failCount++;
+            if (failCount >= 2) {
+                log(`HINT: Try 'man ${cmd}' or check the mission objective.`, 'highlight');
+                failCount = 0;
+            } else {
+                log("Command not recognized or out of sequence.", "error");
+            }
         }
     }
 
@@ -324,7 +295,7 @@
         if (phase > 8) {
             document.getElementById('grad-modal').style.display = 'flex';
         } else {
-            log(phases[phase].lola, 'lola');
+            log(`\nNEW MISSION: ${phases[phase].lola}`, 'lola');
             updateUI();
         }
     }
@@ -340,10 +311,9 @@
     }
 
     function showAchievements() {
-        alert("🏆 Achievements unlocked:\n• First Steps\n• Git Initiate\n• Escape Pod Engineer\n\nNext update will track real progress!");
+        alert("🏆 Achievements:\n• Shell Cadet\n• Navigator\n• File Architect\n• Git Master");
     }
 
-    // Command history (Up / Down arrows)
     document.getElementById('command-input').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             handleCommand(e.target.value);
@@ -365,12 +335,13 @@
             }
         } else if (e.key === 'Tab') {
             e.preventDefault();
-            // simple tab complete (existing logic)
             const val = e.target.value.trim().split(' ');
             const last = val[val.length - 1];
             const match = vfs[currentPath]?.children?.find(i => i.startsWith(last));
-            if (match) val[val.length - 1] = match;
-            e.target.value = val.join(' ');
+            if (match) {
+                val[val.length - 1] = match;
+                e.target.value = val.join(' ');
+            }
         }
     });
 </script>
