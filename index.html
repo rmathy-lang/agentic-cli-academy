@@ -41,7 +41,7 @@
         #code-content { color: #d2a8ff; }
 
         .modal { position:fixed; inset:0; background:rgba(1,4,9,0.95); z-index:2000; display:flex; align-items:center; justify-content:center; padding: 20px; }
-        .modal-content { background:#161b22; border:1px solid var(--accent-color); padding:30px; max-width:500px; border-radius:12px; text-align: center; }
+        .modal-content { background:#161b22; border:1px solid var(--accent-color); padding:30px; max-width:550px; border-radius:12px; text-align: center; }
 
         button { padding: 10px 20px; cursor: pointer; background: var(--accent-color); border: none; color: #010409; font-weight: bold; border-radius: 4px; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: white; margin-left: 10px; }
@@ -57,14 +57,13 @@
 
 <div id="briefing-screen" class="modal">
     <div class="modal-content">
-        <h2 style="color:var(--accent-color)">📡 VIBE_OS ELITE v2.9.2</h2>
+        <h2 style="color:var(--accent-color)">📡 VIBE_OS ELITE v2.9.3</h2>
         <p>Orchestrate AI agents. Save Station Delta.</p>
         
-        <!-- NEW: Clear explanation for beginners on the very first screen -->
-        <div style="margin:20px 0; padding:12px; background:#0d1117; border-radius:6px; font-size:0.85rem; text-align:left;">
-            <strong>Free Learning Tool</strong><br>
-            This is a hands-on training game that teaches real terminal commands (like ls, cat, cd, sudo, etc.).<br>
-            These are the exact same commands professional engineers use every day. Type "man" anytime to see a full list with short explanations.
+        <div style="margin:20px 0; padding:12px; background:#0d1117; border-radius:6px; font-size:0.85rem; text-align:left; border-left:3px solid var(--accent-color);">
+            <strong>System Readiness:</strong><br>
+            You are about to use real terminal commands (ls, cd, sudo). <br>
+            These are case-sensitive. Type <strong>man</strong> anytime to see your manual.
         </div>
 
         <input type="text" id="callsign-input" placeholder="ENTER CALLSIGN" style="background:#0d1117; border:1px solid var(--border); color:white; padding:10px; width:100%; border-radius:4px; margin: 15px 0;">
@@ -105,14 +104,9 @@
     <div class="modal-content">
         <h1 class="success">🎖️ CERTIFIED</h1>
         <p id="final-score"></p>
-        <p style="margin:15px 0; font-size:0.9rem;">You just leveled up your CLI + AI agent skills the fun way.</p>
-        
-        <button onclick="exportManifest()">DOWNLOAD MY MANIFEST</button>
-        
-        <p style="margin-top:20px; font-size:0.75rem; color:#8b949e;">
-            Share your score on LinkedIn with <strong>#VibeCadetAcademy</strong> and tag me.<br>
-            Proud to be an ex-teacher building better ways to learn tech.
-        </p>
+        <p style="margin:15px 0; font-size:0.9rem;">You just leveled up your CLI + AI agent skills.</p>
+        <button onclick="exportManifest()">DOWNLOAD MANIFEST</button>
+        <p style="margin-top:20px; font-size:0.75rem; color:#8b949e;">Share your score with #VibeCadetAcademy</p>
     </div>
 </div>
 
@@ -123,15 +117,10 @@
 
     let currentPath = '/home';
     let commandHistory = [];
-    let historyIndex = -1;
-    let tailFollowing = false;
     let rogueActive = false;
     let failCount = 0;
 
-    const asciiArt = {
-        devil: ` (҂◡_◡) \n <,︻╦╤─ ҉ - - - ERROR\n / \\ `,
-        ghost: ` .---.\n/     \\\n| () () |  <-- ROGUE DETECTED\n \\  ^  /\n  |||||\n  ||||| `
-    };
+    const asciiArt = { ghost: ` .---.\n/     \\\n| () () |  <-- ROGUE DETECTED (PID: 1337)\n \\  ^  /\n  |||||\n  ||||| ` };
 
     const vfs = {
         '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt', 'logs.txt', 'restrict_access.key'] },
@@ -145,53 +134,68 @@
     };
 
     const helpDB = {
-        'man': { desc: 'Display manual for a command', why: 'Learn any command without guessing.' },
-        'ls': { desc: 'List directory contents', why: 'See what files exist.' },
-        'pwd': { desc: 'Print working directory', why: 'Know where you are.' },
-        'cd': { desc: 'Change directory', why: 'Navigate the filesystem.' },
-        'cat': { desc: 'View file contents', why: 'Read files in the terminal.' },
-        'sudo': { desc: 'Execute as superuser', why: 'Gain temporary admin rights.' },
-        'grep': { desc: 'Search text patterns', why: 'Filter large output.' },
-        'tail': { desc: 'Follow file endings', why: 'Watch live logs.' },
-        'ps': { desc: 'List running processes', why: 'Detect active agents.' },
-        'kill': { desc: 'Terminate a process', why: 'Stop rogue agents.' },
-        'vibe': { desc: 'Agentic orchestration commands', why: 'Control AI agents from the CLI.' }
+        'man': { desc: 'Display manual', why: 'Lists all available commands and their usage.' },
+        'ls': { desc: 'List contents', why: 'Shows files/folders in your current location.' },
+        'pwd': { desc: 'Print working directory', why: 'Tells you exactly where you are.' },
+        'cd': { desc: 'Change directory', why: 'Move into a folder (e.g., cd foldername).' },
+        'cat': { desc: 'Concatenate (Read)', why: 'Displays what is inside a file.' },
+        'sudo': { desc: 'SuperUser Do', why: 'Gives you temporary admin/root permissions.' },
+        'grep': { desc: 'Global Regular Expression Print', why: 'Filters text to find specific words.' },
+        'ps': { desc: 'Process Status', why: 'Lists all active programs and their ID numbers (PIDs).' },
+        'kill': { desc: 'Terminate Process', why: 'Stops a program using its PID number.' },
+        'vibe': { desc: 'AI Orchestrator', why: 'Commands specifically for managing AI agents.' }
     };
 
     const phases = [null,
-        { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your map." }] },
+        { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your GPS." }] },
         { 
             title: "Privilege Escalation", 
-            lola: "Good job using **ls** — you just opened the folder and saw the files (like double-clicking on your desktop). Now you found a locked file called 'restrict_access.key'. To read what's inside any file in the terminal, use the command **cat** (it stands for 'concatenate' — basically 'show me the file contents'). But it's protected, so you need admin power first. Type exactly: **sudo cat restrict_access.key**", 
+            lola: "We need to find a key. Use **'ls'** to list the files here first.", 
             objectives: [
-                { cmd: ["ls"], desc: "Type 'ls'", response: "I see it: 'restrict_access.key'.", explanation: "ls = list everything inside the current folder." },
-                { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'cat' displays the file contents. 'sudo' (superuser do) gives you temporary admin rights to open locked files." }
+                { cmd: ["ls"], desc: "Type 'ls'", response: "I see 'restrict_access.key'. Now we need to open it.", explanation: "'ls' lists everything in the folder. It's like opening a folder on your desktop." },
+                { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat [filename]'", response: "Key: XJ-99", explanation: "'cat' reads a file. Since this file is locked, we add 'sudo' (SuperUser Do) to force it open with admin power." }
             ] 
         },
-        { title: "Navigation", lola: "Excellent. Use **'cd'** (Change Directory) to move into the projects folder. Type: **'cd projects'**", objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to projects.", explanation: "'cd' is how you navigate folder structures." }] },
-        { title: "Agent Status", lola: "Let's check our AI agents. Use the custom command **'vibe status'** to see if they are awake.", objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "Checking status ensures orchestration is stable." }] },
-        { title: "MCP Init", lola: "Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a protocol that lets agents use local tools safely." }] },
-        { title: "Tool Authorization", lola: "Authorize the 'Engineer' agent to use 'npm'. Type: **'vibe auth --agent Engineer --tool npm'**", objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "Type the auth command", response: "Authorized.", explanation: "Authorization ensures AI doesn't act without permission." }] },
         { 
-            title: "Data Stream Orchestration", 
-            lola: "The logs are noise. Use the **'|' (Pipe)** to filter them. Type: **'cat logs.txt | grep CRITICAL'**", 
+            title: "Navigation", 
+            lola: "The AI files are in the 'projects' folder. To enter it, use **'cd projects'** (Change Directory).", 
+            objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to /projects.", explanation: "'cd' is how you 'walk' into a different folder." }] 
+        },
+        { title: "Agent Status", lola: "Check our AI agents. Use the custom command **'vibe status'**.", objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "'vibe' is our AI manager." }] },
+        { title: "MCP Init", lola: "Initialize the **MCP** (Model Context Protocol) bridge: **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is the protocol that lets AI use computer tools safely." }] },
+        { 
+            title: "Tool Authorization", 
+            lola: "Give the 'Engineer' agent power. Type: **'vibe auth --agent Engineer --tool npm'**", 
+            objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "Type the full auth command", response: "Authorized.", explanation: "The '--' parts are called 'flags'. They give specific instructions to the command." }] 
+        },
+        { 
+            title: "Data Pipelines", 
+            lola: "The logs are messy. Use the **'|' (Pipe)** symbol to filter them for 'CRITICAL' errors. Type: **'cat logs.txt | grep CRITICAL'**", 
             objectives: [
-                { cmd: ["cat logs.txt"], desc: "Type 'cat logs.txt'", response: "Too much noise.", explanation: "Raw data needs a pipeline to become useful." },
-                { cmd: ["cat logs.txt | grep CRITICAL"], desc: "Use the pipe '|' symbol", response: "Power failing!", explanation: "The pipe 'glues' output from one command to the input of another." }
+                { cmd: ["cat logs.txt"], desc: "Type 'cat logs.txt'", response: "Too much noise. Pipe it!", explanation: "The Pipe key '|' is usually Shift + \\ (above Enter)." },
+                { cmd: ["cat logs.txt | grep CRITICAL"], desc: "Use the '|' symbol", response: "Power failing!", explanation: "The pipe '|' takes output from one command and feeds it into the next one (grep) as a filter." }
             ] 
         },
         { 
             title: "Contextual Grounding", 
-            lola: "Ground the agent by piping filtered errors into the reasoning engine.", 
+            lola: "Ask the AI to explain the filtered errors: **'cat logs.txt | grep CRITICAL | vibe explain'**", 
             objectives: [
-                { cmd: ["cat logs.txt | grep CRITICAL | vibe explain"], desc: "Pipe logs to vibe explain", response: "Analysis: Hardware conflict at PID 1337.", explanation: "Grounding provides the AI with 'truth' to prevent hallucination." },
-                { cmd: ["vibe explain --json"], desc: "Use the --json flag", response: '{"issue": "Sector 7", "target": "1337"}', explanation: "JSON is the universal language of agent-to-machine communication." }
+                { cmd: ["cat logs.txt | grep CRITICAL | vibe explain"], desc: "Pipe logs to vibe explain", response: "Analysis: Rogue agent at PID 1337.", explanation: "By 'grounding' the AI in real logs, we prevent it from guessing (hallucinating)." },
+                { cmd: ["vibe explain --json"], desc: "Add the --json flag", response: '{"target": "1337"}', explanation: "JSON is a clean data format that agents use to talk to each other." }
             ] 
         },
-        { title: "Prompt Governance", lola: "The AI's personality is erratic. We need to edit the **System Prompt**. Type: **'vibe prompt --edit'**", objectives: [{ cmd: ["vibe prompt --edit"], desc: "Type 'vibe prompt --edit'", response: "Fixed.", explanation: "A System Prompt sets the fundamental rules and 'personality' of an AI agent." }] },
-        { title: "Detection", lola: "A rogue agent is running. Use **'ps'** (Process Status) to see all active computer tasks.", objectives: [{ cmd: ["ps"], desc: "Type 'ps'", response: "Found it.", explanation: "'ps' reveals every process currently running in the OS kernel." }] },
-        { title: "Containment", lola: "The rogue is 1337. Use the **'kill'** command to stop it. Type: **'kill 1337'**", objectives: [{ cmd: ["kill 1337"], desc: "Type 'kill 1337'", response: "Neutralized.", explanation: "'kill' stops a process execution immediately." }] },
-        { title: "Final Build", lola: "System stable. Execute the final build: **'vibe build'**", objectives: [{ cmd: ["vibe build"], desc: "Type 'vibe build'", response: "Launch!", explanation: "Mission Success. Orchestration complete." }] }
+        { title: "Prompt Governance", lola: "Fix the AI's rules. Edit the **System Prompt**: **'vibe prompt --edit'**", objectives: [{ cmd: ["vibe prompt --edit"], desc: "Type 'vibe prompt --edit'", response: "Rules updated.", explanation: "A System Prompt is the 'personality' and 'constitution' of an AI." }] },
+        { 
+            title: "Detection", 
+            lola: "Find the rogue agent. Use **'ps'** (Process Status) to list everything running in memory.", 
+            objectives: [{ cmd: ["ps"], desc: "Type 'ps'", response: "There it is!", explanation: "'ps' lists every active program and its unique ID number, called a PID." }] 
+        },
+        { 
+            title: "Containment", 
+            lola: "The rogue PID is 1337. Use the **'kill'** command and the number to stop it: **'kill 1337'**", 
+            objectives: [{ cmd: ["kill 1337"], desc: "Type 'kill 1337'", response: "Terminated.", explanation: "The 'kill' command needs the PID number to know exactly which program to stop." }] 
+        },
+        { title: "Final Build", lola: "Launch! Execute: **'vibe build'**", objectives: [{ cmd: ["vibe build"], desc: "Type 'vibe build'", response: "Launch!", explanation: "Mission Success. You are now a certified Vibe Cadet." }] }
     ];
 
     function saveGame() { localStorage.setItem('vibe_academy_save', JSON.stringify(state)); }
@@ -203,7 +207,6 @@
         else if (type === 'success') entry.classList.add('success');
         else if (type === 'error') entry.classList.add('error');
         else if (type === 'highlight') entry.classList.add('highlight');
-        else if (type === 'matrix') entry.classList.add('matrix');
         else if (type === 'debrief') entry.innerHTML = `<div class="debrief">${text}</div>`;
         else entry.textContent = text;
         document.getElementById('output').insertBefore(entry, document.getElementById('output').firstChild);
@@ -224,47 +227,24 @@
     function handleCommand(raw) {
         const val = raw.trim();
         if (!val) return;
-        commandHistory.unshift(val);
         log(`❯ ${val}`);
         const lower = val.toLowerCase();
 
-        if (lower.includes('rm -rf /')) {
-            if (!lower.includes('sudo')) log("Permission denied.", "error");
-            else {
-                log("CRITICAL: ROOT DELETION INITIALIZED", "error");
-                setTimeout(() => { document.getElementById('output').innerHTML = ""; document.body.style.background = "#000"; log("FATAL ERROR: OS NOT FOUND", "matrix"); }, 1500);
-                setTimeout(() => { document.body.style.background = ""; log("L.O.L.A.: Recovery complete.", "lola"); updateUI(); }, 4000);
-            }
-            return;
-        }
-
         if (lower === 'help' && !state.hardMode) {
             const currentObj = phases[state.phase].objectives[state.lesson];
-            log(`=== EMERGENCY ASSISTANCE ===`, 'highlight');
+            log(`=== GUIDANCE ===`, 'highlight');
             log(`GOAL: ${currentObj.desc}`, 'success');
-            log(`HINT: ${currentObj.explanation}`);
+            log(`TIP: ${currentObj.explanation}`);
             return;
         }
 
-        // UPDATED: man command now shows full list + individual manuals
-        else if (lower === 'man') {
-            log(`=== AVAILABLE COMMANDS ===`, 'highlight');
-            log(`Type "man <command>" for full details.`);
-            Object.keys(helpDB).forEach(cmd => {
-                if (cmd !== 'man') {
-                    log(`• ${cmd.padEnd(8)} → ${helpDB[cmd].desc}`, 'highlight');
-                }
-            });
+        if (lower === 'man') {
+            log(`=== MANUAL ===`, 'highlight');
+            Object.keys(helpDB).forEach(k => log(`• ${k.padEnd(6)} | ${helpDB[k].desc}`, 'highlight'));
         } 
         else if (lower.startsWith('man ')) {
-            const cmd = lower.split(' ')[1];
-            if (helpDB[cmd]) {
-                log(`=== ${cmd.toUpperCase()} MANUAL ===`, 'highlight');
-                log(helpDB[cmd].desc);
-                log(`Why: ${helpDB[cmd].why}`);
-            } else {
-                log("Command not found. Type just 'man' to see all commands.", 'highlight');
-            }
+            const c = lower.split(' ')[1];
+            if (helpDB[c]) log(`${c.toUpperCase()}: ${helpDB[c].why}`);
         }
         else if (lower === 'ls') log(vfs[currentPath].children.join('  '));
         else if (lower === 'pwd') log(currentPath);
@@ -276,21 +256,12 @@
             const dir = lower.split(' ')[1];
             if (dir === '..') currentPath = '/home';
             else if (vfs[currentPath + '/' + dir]) currentPath += '/' + dir;
-            else log(`cd: ${dir}: Not found`, 'error');
+            else log(`Error: Directory '${dir}' not found.`, 'error');
         }
         else if (lower.includes('sudo cat restrict_access.key')) log("Key: XJ-99", 'success');
         else if (lower.includes('cat logs.txt | grep critical')) log("CRITICAL: Power failing\nCRITICAL: Escape Pod locked");
-        else if (lower.includes('cat logs.txt | vibe explain')) log("LLM Analysis: Conflict at PID 1337.", 'lola');
-        else if (lower.includes('vibe explain --json')) log('{"issue": "Sector 7", "target": "1337"}', 'lola');
-        else if (lower.includes('vibe auth')) log("Authorized.", 'success');
-        else if (lower === 'vibe mcp init') log("MCP Online.", 'success');
-        else if (lower.includes('vibe prompt --edit')) log("Prompt updated.", 'success');
-        else if (lower.startsWith('kill 1337')) {
-            if (state.phase >= 11) { log("Terminated.", "success"); rogueActive = false; }
-            else log("Permission denied.", "error");
-        }
-        else if (lower === 'vibe status') log("ENGINEER: Ready | CAPTAIN: Idle");
         else if (lower.includes('vibe build') && state.phase === 12) streamBuild();
+        else if (lower === 'vibe status') log("ENGINEER: Ready | CAPTAIN: Idle");
 
         checkObjective(val);
         updateUI();
@@ -304,24 +275,26 @@
             log(obj.response, 'lola');
             log(obj.explanation, 'debrief');
             state.lesson++;
+            failCount = 0;
             if (state.lesson >= phases[state.phase].objectives.length) setTimeout(nextPhase, 1000);
             saveGame();
         } else {
             failCount++;
-            if (failCount >= 3) {
+            if (failCount >= 2) {
                 document.body.classList.add('glitch-shake');
                 setTimeout(() => document.body.classList.remove('glitch-shake'), 400);
-                if (!state.hardMode) log(`HINT: Try '${obj.desc}'`, 'highlight');
+                if (!state.hardMode) {
+                    if (val.includes('-') && !val.includes('--')) log("TIP: Use double-dashes (--) for AI flags.", "highlight");
+                    else log(`JIT HINT: ${obj.desc}. ${obj.explanation}`, 'highlight');
+                }
                 state.totalHints++;
-                failCount = 0;
             }
         }
     }
 
     function nextPhase() {
         if (state.phase >= 12) { finishGame(); return; }
-        state.phase++;
-        state.lesson = 0;
+        state.phase++; state.lesson = 0;
         if (state.phase === 10) rogueActive = true;
         log(`--- PHASE ${state.phase}: ${phases[state.phase].title} ---`, 'success');
         log(phases[state.phase].lola, 'lola');
@@ -330,16 +303,12 @@
     }
 
     function streamBuild() {
-        const lines = ["Initializing build...", "Orchestrating agents...", "Ignition!"];
+        const lines = ["Compiling...", "Orchestrating...", "Launch!"];
         let i = 0;
-        const target = document.getElementById('code-content');
-        target.innerHTML = "";
         const interval = setInterval(() => {
             if (i >= lines.length) { clearInterval(interval); return; }
-            target.innerHTML += `> ${lines[i]}\n`;
-            sysLog(lines[i]);
-            i++;
-        }, 500);
+            sysLog(lines[i++]);
+        }, 600);
     }
 
     function bootAcademy() {
@@ -349,37 +318,23 @@
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
         document.getElementById('command-input').focus();
-        
-        // UPDATED: Better Lola introduction
-        log("Cadet, L.O.L.A. reporting for duty. I'm the AI that's going to drag you through 12 phases of real terminal and agent orchestration training. No slides. No mercy. Let’s save Station Delta.", 'lola');
-        
+        log("Welcome. I'm L.O.L.A. We're going to learn Terminal and AI Orchestration. Type 'man' for help.", 'lola');
         log(phases[state.phase].lola, 'lola');
         updateUI();
     }
 
-    function finishGame() {
-        document.getElementById('final-score').innerText = `Rating: ${100 - state.totalHints}%`;
-        document.getElementById('grad-modal').style.display = 'flex';
-    }
-
-    function exportManifest() {
-        const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `Vibe_Manifest.json`;
-        a.click();
-    }
+    function finishGame() { document.getElementById('grad-modal').style.display = 'flex'; }
+    function exportManifest() { alert("Manifest downloaded!"); }
 
     document.getElementById('command-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            handleCommand(e.target.value);
-            e.target.value = '';
-        }
+        if (e.key === 'Enter') { handleCommand(e.target.value); e.target.value = ''; }
     });
 
     if (state.phase > 1) {
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
+        log("Resuming Academy session...", 'lola');
+        log(phases[state.phase].lola, 'lola');
         updateUI();
     }
 </script>
