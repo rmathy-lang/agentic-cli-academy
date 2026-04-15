@@ -143,20 +143,72 @@
         'vibe': { desc: 'Agentic orchestration commands', why: 'Control AI agents from the CLI.' }
     };
 
-    const phases = [null,
-        { title: "Standard Errors", lola: "Cadet, confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Run 'pwd'", response: "Path confirmed.", explanation: "pwd shows your system context." }] },
-        { title: "Privilege Escalation", lola: "The access key is locked. You need 'sudo' to read it.", objectives: [{ cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "Sudo allows agents to override restricted file locks." }] },
-        { title: "Navigation", lola: "Go to 'projects'.", objectives: [{ cmd: ["cd projects"], desc: "cd projects", response: "Moved.", explanation: "cd is movement." }] },
-        { title: "Agent Status", lola: "Check agents.", objectives: [{ cmd: ["vibe status"], desc: "vibe status", response: "Idle.", explanation: "Monitor agent health." }] },
-        { title: "MCP Init", lola: "Initialize MCP.", objectives: [{ cmd: ["vibe mcp init"], desc: "vibe mcp init", response: "Online.", explanation: "MCP is the bridge." }] },
-        { title: "Tool Auth", lola: "Auth 'npm'.", objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "vibe auth", response: "Auth'd.", explanation: "Explicit permissions." }] },
-        { title: "Piping Logs", lola: "Grep CRITICAL.", objectives: [{ cmd: ["cat logs.txt | grep CRITICAL"], desc: "Pipe to grep", response: "Power failing!", explanation: "Pipes connect tools." }] },
-        { title: "LLM Reasoning", lola: "vibe explain.", objectives: [{ cmd: ["cat logs.txt | vibe explain"], desc: "vibe explain", response: "PID 1337!", explanation: "LLM reasoning filter." }] },
-        { title: "Structured Info", lola: "Use --json.", objectives: [{ cmd: ["vibe explain --json"], desc: "Use --json", response: '{"target": "1337"}', explanation: "JSON is agent-speak." }] },
-        { title: "Prompt Governance", lola: "vibe prompt --edit.", objectives: [{ cmd: ["vibe prompt --edit"], desc: "vibe prompt", response: "Fixed.", explanation: "Prompts are guardrails." }] },
-        { title: "Detection", lola: "Run 'ps'.", objectives: [{ cmd: ["ps"], desc: "ps", response: "Found.", explanation: "ps lists agents." }] },
-        { title: "Containment", lola: "Kill 1337.", objectives: [{ cmd: ["kill 1337"], desc: "kill 1337", response: "Neutralized.", explanation: "Kill stops the loop." }] },
-        { title: "Final Build", lola: "vibe build.", objectives: [{ cmd: ["vibe build"], desc: "vibe build", response: "Launch!", explanation: "Success." }] }
+   const phases = [null,
+        { 
+            title: "Standard Errors", 
+            lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", 
+            objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your map. It tells you exactly which folder you are currently standing in." }] 
+        },
+        { 
+            title: "Privilege Escalation", 
+            lola: "The security key is locked. To read it, you must use **'sudo'** (SuperUser Do) to act as an admin, combined with **'cat'** (Concatenate) to read the file. Try: **'sudo cat restrict_access.key'**", 
+            objectives: [{ cmd: ["sudo cat restrict_access.key"], desc: "Type 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'sudo' is like 'Simon Says' for computers—it forces the system to let you do things normally restricted." }] 
+        },
+        { 
+            title: "Navigation", 
+            lola: "Good. Now we need to find the AI files. Use **'cd'** (Change Directory) to move into the projects folder. Type: **'cd projects'**", 
+            objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to projects.", explanation: "'cd' is how you walk through the doors of different folders in a computer's memory." }] 
+        },
+        { 
+            title: "Agent Status", 
+            lola: "Let's check our AI agents. Use the custom command **'vibe status'** to see if they are awake.", 
+            objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "In this system, 'vibe' is our control tool for AI agents. Checking status ensures no one is 'frozen'." }] 
+        },
+        { 
+            title: "MCP Init", 
+            lola: "We need a bridge between our logic and our tools. Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", 
+            objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a real-world standard that lets AI agents use local tools (like calculators or web browsers) safely." }] 
+        },
+        { 
+            title: "Tool Authorization", 
+            lola: "AI Agents shouldn't have power without permission. Use **'vibe auth'** to give the 'Engineer' agent access to the 'npm' tool. Type: **'vibe auth --agent Engineer --tool npm'**", 
+            objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "Type the full auth command", response: "Authorized.", explanation: "Explicit authorization prevents AI from making 'accidental' changes to your computer." }] 
+        },
+        { 
+            title: "Piping Logs", 
+            lola: "The logs are too messy. We need to 'pipe' the data through a filter. Use the **'|'** (Pipe) symbol and **'grep'** (Global Regular Expression Print) to find 'CRITICAL' errors. Type: **'cat logs.txt | grep CRITICAL'**", 
+            objectives: [{ cmd: ["cat logs.txt | grep CRITICAL"], desc: "Use the pipe '|' symbol", response: "Power failing!", explanation: "The pipe '|' takes the output of one command and sends it to another. 'grep' searches for specific words." }] 
+        },
+        { 
+            title: "LLM Reasoning", 
+            lola: "Now, let's ask the AI to explain those logs. Pipe the logs into our reasoning tool: **'cat logs.txt | vibe explain'**", 
+            objectives: [{ cmd: ["cat logs.txt | vibe explain"], desc: "Pipe logs to vibe explain", response: "PID 1337!", explanation: "Using an LLM (Large Language Model) to filter terminal output is a core part of modern AI automation." }] 
+        },
+        { 
+            title: "Structured Info", 
+            lola: "AI agents communicate best with clean data. Add the **'--json'** flag to get a computer-readable explanation. Type: **'vibe explain --json'**", 
+            objectives: [{ cmd: ["vibe explain --json"], desc: "Add the --json flag", response: '{"target": "1337"}', explanation: "JSON is the 'universal language' of the internet. It makes it easy for different AI agents to talk to each other." }] 
+        },
+        { 
+            title: "Prompt Governance", 
+            lola: "Our AI is hallucinating. We need to edit the **System Prompt** (the AI's instructions). Type: **'vibe prompt --edit'**", 
+            objectives: [{ cmd: ["vibe prompt --edit"], desc: "Type 'vibe prompt --edit'", response: "Fixed.", explanation: "A System Prompt is the 'personality' and 'rules' you give an AI to keep it on track." }] 
+        },
+        { 
+            title: "Detection", 
+            lola: "A rogue agent is running. Use **'ps'** (Process Status) to see all active computer tasks.", 
+            objectives: [{ cmd: ["ps"], desc: "Type 'ps'", response: "Found.", explanation: "'ps' shows you everything currently 'alive' in the computer's brain." }] 
+        },
+        { 
+            title: "Containment", 
+            lola: "Found it! The rogue process is number 1337. Use the **'kill'** command to stop it. Type: **'kill 1337'**", 
+            objectives: [{ cmd: ["kill 1337"], desc: "Type 'kill 1337'", response: "Neutralized.", explanation: "'kill' sends a signal to a process to stop immediately. It's the ultimate 'undo' button for a runaway program." }] 
+        },
+        { 
+            title: "Final Build", 
+            lola: "System stable. Time to launch. Execute the final build: **'vibe build'**", 
+            objectives: [{ cmd: ["vibe build"], desc: "Type 'vibe build'", response: "Launch!", explanation: "Mission Success. You've orchestrated a full AI system from the command line." }] 
+        }
     ];
 
     function saveGame() { localStorage.setItem('vibe_academy_save', JSON.stringify(state)); }
