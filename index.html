@@ -59,6 +59,14 @@
     <div class="modal-content">
         <h2 style="color:var(--accent-color)">📡 VIBE_OS ELITE v2.9.2</h2>
         <p>Orchestrate AI agents. Save Station Delta.</p>
+        
+        <!-- NEW: Clear explanation for beginners on the very first screen -->
+        <div style="margin:20px 0; padding:12px; background:#0d1117; border-radius:6px; font-size:0.85rem; text-align:left;">
+            <strong>Free Learning Tool</strong><br>
+            This is a hands-on training game that teaches real terminal commands (like ls, cat, cd, sudo, etc.).<br>
+            These are the exact same commands professional engineers use every day. Type "man" anytime to see a full list with short explanations.
+        </div>
+
         <input type="text" id="callsign-input" placeholder="ENTER CALLSIGN" style="background:#0d1117; border:1px solid var(--border); color:white; padding:10px; width:100%; border-radius:4px; margin: 15px 0;">
         <div style="margin-bottom: 15px;">
             <input type="checkbox" id="hardmode-toggle"> <label for="hardmode-toggle" style="font-size: 0.8rem;">HARD MODE (No Hints)</label>
@@ -97,7 +105,14 @@
     <div class="modal-content">
         <h1 class="success">🎖️ CERTIFIED</h1>
         <p id="final-score"></p>
-        <button onclick="exportManifest()">DOWNLOAD MANIFEST</button>
+        <p style="margin:15px 0; font-size:0.9rem;">You just leveled up your CLI + AI agent skills the fun way.</p>
+        
+        <button onclick="exportManifest()">DOWNLOAD MY MANIFEST</button>
+        
+        <p style="margin-top:20px; font-size:0.75rem; color:#8b949e;">
+            Share your score on LinkedIn with <strong>#VibeCadetAcademy</strong> and tag me.<br>
+            Proud to be an ex-teacher building better ways to learn tech.
+        </p>
     </div>
 </div>
 
@@ -146,13 +161,13 @@
     const phases = [null,
         { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your map." }] },
         { 
-    title: "Privilege Escalation", 
-    lola: "Good job using **ls** — you just opened the folder and saw the files (like double-clicking on your desktop). Now you found a locked file called 'restrict_access.key'. To read what's inside any file in the terminal, use the command **cat** (it stands for 'concatenate' — basically 'show me the file contents'). But it's protected, so you need admin power first. Type exactly: **sudo cat restrict_access.key**", 
-    objectives: [
-        { cmd: ["ls"], desc: "Type 'ls'", response: "I see it: 'restrict_access.key'.", explanation: "ls = list everything inside the current folder." },
-        { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'cat' displays the file contents. 'sudo' (superuser do) gives you temporary admin rights to open locked files." }
-    ] 
-},
+            title: "Privilege Escalation", 
+            lola: "Good job using **ls** — you just opened the folder and saw the files (like double-clicking on your desktop). Now you found a locked file called 'restrict_access.key'. To read what's inside any file in the terminal, use the command **cat** (it stands for 'concatenate' — basically 'show me the file contents'). But it's protected, so you need admin power first. Type exactly: **sudo cat restrict_access.key**", 
+            objectives: [
+                { cmd: ["ls"], desc: "Type 'ls'", response: "I see it: 'restrict_access.key'.", explanation: "ls = list everything inside the current folder." },
+                { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'cat' displays the file contents. 'sudo' (superuser do) gives you temporary admin rights to open locked files." }
+            ] 
+        },
         { title: "Navigation", lola: "Excellent. Use **'cd'** (Change Directory) to move into the projects folder. Type: **'cd projects'**", objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to projects.", explanation: "'cd' is how you navigate folder structures." }] },
         { title: "Agent Status", lola: "Let's check our AI agents. Use the custom command **'vibe status'** to see if they are awake.", objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "Checking status ensures orchestration is stable." }] },
         { title: "MCP Init", lola: "Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a protocol that lets agents use local tools safely." }] },
@@ -231,13 +246,25 @@
             return;
         }
 
-        if (lower.startsWith('man ')) {
+        // UPDATED: man command now shows full list + individual manuals
+        else if (lower === 'man') {
+            log(`=== AVAILABLE COMMANDS ===`, 'highlight');
+            log(`Type "man <command>" for full details.`);
+            Object.keys(helpDB).forEach(cmd => {
+                if (cmd !== 'man') {
+                    log(`• ${cmd.padEnd(8)} → ${helpDB[cmd].desc}`, 'highlight');
+                }
+            });
+        } 
+        else if (lower.startsWith('man ')) {
             const cmd = lower.split(' ')[1];
             if (helpDB[cmd]) {
                 log(`=== ${cmd.toUpperCase()} MANUAL ===`, 'highlight');
                 log(helpDB[cmd].desc);
                 log(`Why: ${helpDB[cmd].why}`);
-            } else log("Commands: ls, pwd, cd, cat, sudo, grep, tail, ps, kill, vibe", 'highlight');
+            } else {
+                log("Command not found. Type just 'man' to see all commands.", 'highlight');
+            }
         }
         else if (lower === 'ls') log(vfs[currentPath].children.join('  '));
         else if (lower === 'pwd') log(currentPath);
@@ -322,7 +349,10 @@
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
         document.getElementById('command-input').focus();
-        log("L.O.L.A. online. I'm your Learning Orchestration & Logistics Assistant — but you can call me Lola. Ready to turn you from a vibe coder into a terminal elite, Cadet?", 'lola');
+        
+        // UPDATED: Better Lola introduction
+        log("Cadet, L.O.L.A. reporting for duty. I'm the AI that's going to drag you through 12 phases of real terminal and agent orchestration training. No slides. No mercy. Let’s save Station Delta.", 'lola');
+        
         log(phases[state.phase].lola, 'lola');
         updateUI();
     }
