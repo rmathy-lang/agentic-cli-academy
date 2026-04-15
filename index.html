@@ -5,68 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vibe Cadet Academy: Elite Edition</title>
     <style>
-        :root { --bg-color: #0d1117; --text-color: #c9d1d9; --prompt-color: #58a6ff; --accent-color: #2ea043;
-                --error-color: #f85149; --highlight-color: #f0883e; --border: #30363d; --font-family: 'Fira Code', monospace; }
-        body { background-color: #010409; color: var(--text-color); font-family: var(--font-family); margin:0; height:100vh; display:flex; flex-direction:column; overflow:hidden;
-               background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); background-size: 100% 2px, 3px 100%; }
-        #academy-bar { height:40px; background:#161b22; border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:20px; font-size:0.8rem; }
-        #progress-fill { height:4px; background:linear-gradient(90deg, var(--accent-color), #58a6ff); width:0%; transition:width 0.5s; box-shadow:0 0 10px var(--accent-color); }
-        #game-layout { display:grid; grid-template-columns:1fr 380px; grid-template-rows:1fr 180px; gap:10px; padding:10px; flex-grow:1; visibility:hidden; }
+        :root { 
+            --bg-color: #0d1117; 
+            --text-color: #c9d1d9; 
+            --prompt-color: #58a6ff; 
+            --accent-color: #2ea043;
+            --error-color: #f85149; 
+            --highlight-color: #f0883e; 
+            --border: #30363d; 
+            --font-family: 'Fira Code', 'Courier New', monospace; 
+        }
+        
+        * { box-sizing: border-box; }
+        body { 
+            background-color: #010409; 
+            color: var(--text-color); 
+            font-family: var(--font-family); 
+            margin:0; 
+            height:100vh; 
+            display:flex; 
+            flex-direction:column; 
+            overflow:hidden;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), 
+                        linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); 
+            background-size: 100% 2px, 3px 100%; 
+        }
+
+        #academy-bar { 
+            height:40px; 
+            background:#161b22; 
+            border-bottom:1px solid var(--border); 
+            display:flex; 
+            align-items:center; 
+            padding:0 20px; 
+            gap:20px; 
+            font-size:0.8rem; 
+        }
+        
+        #progress-container { flex:1; background:#30363d; height:4px; border-radius:2px; position: relative; }
+        #progress-fill { 
+            height:100%; 
+            background:linear-gradient(90deg, var(--accent-color), #58a6ff); 
+            width:0%; 
+            transition:width 0.5s; 
+            box-shadow:0 0 10px var(--accent-color); 
+        }
+
+        #game-layout { 
+            display:grid; 
+            grid-template-columns:1fr 380px; 
+            grid-template-rows:1fr 200px; 
+            gap:10px; 
+            padding:10px; 
+            flex-grow:1; 
+            visibility:hidden; 
+        }
+
         .pane { background:var(--bg-color); border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; overflow:hidden; }
-        .pane-header { background:#161b22; padding:8px 12px; font-size:0.7rem; color:#8b949e; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; }
-        #output { flex-grow:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column-reverse; font-size:0.95rem; line-height:1.6; }
-        .prompt-line { display:flex; padding:12px; background:#0d1117; border-top:1px solid var(--border); }
-        #command-input { flex-grow:1; background:transparent; border:none; color:#fff; outline:none; font-family:inherit; font-size:1rem; }
+        .pane-header { 
+            background:#161b22; 
+            padding:8px 12px; 
+            font-size:0.7rem; 
+            color:#8b949e; 
+            border-bottom:1px solid var(--border); 
+            display:flex; 
+            justify-content:space-between; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #output { 
+            flex-grow:1; 
+            padding:15px; 
+            overflow-y:auto; 
+            display:flex; 
+            flex-direction:column-reverse; 
+            font-size:0.95rem; 
+            line-height:1.6; 
+        }
+
+        .prompt-line { display:flex; padding:12px; background:#0d1117; border-top:1px solid var(--border); align-items: center; }
+        #command-input { 
+            flex-grow:1; 
+            background:transparent; 
+            border:none; 
+            color:#fff; 
+            outline:none; 
+            font-family:inherit; 
+            font-size:1rem; 
+        }
+
         #code-content { padding:15px; font-size:0.85rem; white-space:pre-wrap; color:#d1d5da; line-height:1.4; overflow-y:auto; }
-        #log-stream { padding:10px; font-size:0.75rem; color:#8b949e; overflow-y:auto; background:#161b22; }
+        #log-stream { padding:10px; font-size:0.75rem; color:#8b949e; overflow-y:auto; background:#161b22; height:100%; }
+
+        /* Modals */
         .modal { position:fixed; inset:0; background:rgba(1,4,9,0.98); z-index:2000; display:flex; align-items:center; justify-content:center; }
-        .modal-content { background:#161b22; border:1px solid var(--accent-color); padding:40px; max-width:620px; border-radius:12px; box-shadow:0 0 30px rgba(46,160,67,0.2); }
+        .modal-content { 
+            background:#161b22; 
+            border:1px solid var(--accent-color); 
+            padding:40px; 
+            max-width:620px; 
+            border-radius:12px; 
+            box-shadow:0 0 30px rgba(46,160,67,0.2); 
+        }
+
+        /* Typography */
         .lola { color:var(--accent-color); font-weight:bold; }
         .error { color:var(--error-color); }
         .success { color:var(--accent-color); text-shadow:0 0 5px var(--accent-color); }
         .highlight { color:var(--highlight-color); font-weight:bold; }
-        .debrief { background:rgba(46,160,67,0.1); border-left:4px solid var(--accent-color); padding:12px; margin:8px 0; }
-        .glitch { animation:glitch 0.2s infinite; }
-        @keyframes glitch { 0% { transform:translate(0); } 50% { transform:translate(-2px,2px); background:rgba(255,0,0,0.1); } 100% { transform:translate(0); } }
+        .debrief { background:rgba(46,160,67,0.1); border-left:4px solid var(--accent-color); padding:12px; margin:8px 0; font-size: 0.85rem; border-radius: 0 4px 4px 0; }
+        
+        /* Code Highlighting */
+        .kw { color: #ff7b72; } 
+        .str { color: #a5d6ff; } 
+        .fn { color: #d2a8ff; } 
+        .comment { color: #8b949e; }
+
+        button {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: var(--accent-color);
+            border: none;
+            color: #010409;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.8; }
     </style>
 </head>
 <body onclick="document.getElementById('command-input').focus()">
 
-<!-- Briefing & UI unchanged for brevity — same as last version -->
 <div id="briefing-screen" class="modal">
     <div class="modal-content">
         <h1 style="color:var(--accent-color); margin-top:0;">📡 INCOMING TRANSMISSION</h1>
-        <p style="line-height:1.6; font-size:1.1rem;">The year is 2026. Vibe-Station Delta has gone dark.<br>We need a Cadet who can <span class="highlight">orchestrate AI agents</span> from the command line.</p>
+        <p style="line-height:1.6; font-size:1.1rem;">Vibe-Station Delta is dark. Manual override required.<br>We need a Cadet to <span class="highlight">orchestrate AI agents</span> and restore MCP protocols.</p>
         <div style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
             <label style="display:block; margin-bottom:10px; font-size:0.8rem; color:var(--prompt-color);">ENTER CALLSIGN:</label>
-            <input type="text" id="callsign-input" placeholder="e.g. Maverick" style="background:#0d1117; border:1px solid var(--border); color:white; padding:12px; width:100%; border-radius:6px; font-family:inherit;">
-            <button onclick="bootAcademy()" style="margin-top:20px; width:100%; padding:15px; background:var(--accent-color); border:none; color:#010409; font-weight:bold; border-radius:6px; cursor:pointer;">ACCEPT MISSION</button>
+            <input type="text" id="callsign-input" placeholder="e.g. Maverick" style="background:#0d1117; border:1px solid var(--border); color:white; padding:12px; width:100%; border-radius:6px; font-family:inherit; outline:none;">
+            <button onclick="bootAcademy()" style="margin-top:20px; width:100%;">ACCEPT MISSION</button>
         </div>
     </div>
 </div>
 
 <div id="academy-bar">
     <span style="font-weight:bold; color:var(--accent-color)">VIBE_OS v2.9 • AGENTIC</span>
-    <div style="flex:1; background:#30363d; height:4px; border-radius:2px;"><div id="progress-fill"></div></div>
+    <div id="progress-container"><div id="progress-fill"></div></div>
     <span id="phase-label">PHASE 1/13</span>
-    <button onclick="showAchievements()" style="background:none;border:none;color:#8b949e;cursor:pointer;">🏆</button>
+    <button onclick="alert('🏆 Achievements:\n• Shell Access\n• Pipe Master\n• MCP Architect\n• Rogue Hunter')" style="background:none;border:none;color:#8b949e;padding:0;">🏆</button>
 </div>
 
 <div id="game-layout">
     <div class="pane">
         <div class="pane-header">
             <span>TERMINAL — <span id="user-display">cadet</span>@vibe-station: <span id="path-display">/home</span></span>
-            <span id="status-tag" class="success">ONLINE</span>
+            <span id="status-tag" class="success">● ONLINE</span>
         </div>
         <div id="output"></div>
         <div class="prompt-line">
             <span style="color:var(--prompt-color); margin-right:8px;">❯</span>
-            <input type="text" id="command-input" spellcheck="false" autocomplete="off" placeholder="Type man for help...">
+            <input type="text" id="command-input" spellcheck="false" autocomplete="off" placeholder="Initializing...">
         </div>
     </div>
 
     <div id="code-pane" class="pane">
-        <div class="pane-header">ACTIVE_STREAM.js <span style="color:#2ea043;font-size:0.7rem;">● LIVE</span></div>
+        <div class="pane-header">ACTIVE_ORCHESTRATION.log <span style="color:#2ea043;font-size:0.7rem;">● LIVE</span></div>
         <div id="code-content"></div>
     </div>
 
@@ -78,22 +182,22 @@
 
 <div id="grad-modal" class="modal" style="display:none;">
     <div class="modal-content" style="text-align:center;">
-        <h1 class="success">🎖️ MISSION COMPLETE — AGENTIC CLI MASTER</h1>
-        <p id="final-score"></p>
-        <button onclick="exportManifest()" style="padding:12px 24px; cursor:pointer; margin:10px;">📤 DOWNLOAD PROFICIENCY MANIFEST</button>
-        <button onclick="location.reload()" style="padding:12px 24px; cursor:pointer;">REBOOT ACADEMY</button>
+        <h1 class="success">🎖️ MISSION COMPLETE</h1>
+        <p id="final-score" style="font-size:1.2rem; margin:20px 0;"></p>
+        <p>You have successfully demystified Agentic AI and CLI workflows.</p>
+        <button onclick="exportManifest()" style="margin:10px;">📤 DOWNLOAD MANIFEST</button>
+        <button onclick="location.reload()" style="background:transparent; border:1px solid var(--border); color:white; margin:10px;">REBOOT ACADEMY</button>
     </div>
 </div>
 
 <script>
     let cadetName = "Cadet", currentPath = '/home', phase = 1, lesson = 0, failCount = 0, totalHints = 0;
     let commandHistory = [], historyIndex = -1;
-    let env = { VIBE_API_KEY: null };
-    let agents = { Engineer: { status: "idle", context: 420, thinking: "Analyzing escape pod schematics..." }, Captain: { status: "idle", context: 890, thinking: "Coordinating launch sequence..." } };
     let rogueActive = false;
+    let agents = { Engineer: { status: "idle", context: 420 }, Captain: { status: "idle", context: 890 } };
 
-    const vfs = { /* same as last version + logs.txt etc. */ 
-        '/home': { type: 'dir', children: ['projects','README.txt','manual.txt','logs.txt','restrict_access.key'] },
+    const vfs = {
+        '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt', 'logs.txt', 'restrict_access.key'] },
         '/home/README.txt': { type: 'file', content: 'STATION DELTA: Emergency Protocol Active.' },
         '/home/manual.txt': { type: 'file', content: 'Pro tip: Type "man <command>" for technical specs.' },
         '/home/logs.txt': { type: 'file', content: 'ERROR 404: Oxygen low\nCRITICAL: Power failing\nINFO: AI sleeping\nCRITICAL: Escape Pod locked\nHALLUCINATION: The sky is green' },
@@ -103,104 +207,220 @@
         '/home/projects/game_v1/main.js': { type: 'file', content: 'console.log("Escape Pod ready!");' }
     };
 
-    const phases = [ /* 13 phases — first 10 are your previous excellent ones, then 3 brand new agentic phases */ 
+    const phases = [
         null,
-        // ... (your Standard Errors through Ignition phases from last version kept exactly) ...
-        // New agentic phases:
-        { title: "Agent Orchestration", lola: "Agents are alive. Check their state.", objectives: [
-            { cmd: ["vibe status"], desc: "Run 'vibe status'", response: "Agent status retrieved.", explanation: "vibe status shows live context windows and what each agent is thinking." }
+        { title: "Standard Errors", lola: "Cadet, confirm your location in the system.", objectives: [
+            { cmd: ["pwd"], desc: "Run 'pwd'", response: "Path confirmed.", explanation: "pwd (print working directory) shows your absolute path." },
+            { cmd: ["ls"], desc: "List files", response: "Listing files...", explanation: "ls shows you what files are available to your agent." }
         ]},
-        { title: "Tool Authorization", lola: "The Engineer needs npm. Authorize it.", objectives: [
-            { cmd: ["vibe auth --agent Engineer --tool npm"], desc: "vibe auth --agent Engineer --tool npm", response: "Tool authorized.", explanation: "In real agentic systems you must explicitly grant tools for security." }
+        { title: "Privilege Escalation", lola: "The key is locked. You'll need SuperUser access.", objectives: [
+            { cmd: ["cat restrict_access.key"], desc: "Try to 'cat' the key", response: "Permission denied.", explanation: "Standard users can't read restricted files." },
+            { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat'", response: "Access Granted. Key: XJ-99", explanation: "Sudo (SuperUser Do) grants administrative privileges." }
         ]},
-        { title: "LLM-in-the-Middle", lola: "Pipe logs into the station LLM for analysis.", objectives: [
-            { cmd: ["cat logs.txt | vibe explain"], desc: "cat logs.txt | vibe explain", response: "LLM response received.", explanation: "CLI → LLM → CLI is the new workflow. Try --json for structured output." }
+        { title: "Navigation", lola: "The workspace is in the projects folder.", objectives: [
+            { cmd: ["cd projects"], desc: "Move to projects", response: "Changing directory...", explanation: "cd (change directory) is how you navigate the VFS." }
         ]},
-        { title: "Prompt Governance", lola: "The agent is hallucinating. Edit its system prompt.", objectives: [
-            { cmd: ["vibe prompt --edit \"Always respond in valid JSON\""], desc: "vibe prompt --edit ...", response: "Prompt updated.", explanation: "You just steered an AI's behavior using the CLI. This is the future." }
+        { title: "Agent Orchestration", lola: "Check agent states to begin orchestration.", objectives: [
+            { cmd: ["vibe status"], desc: "Check 'vibe status'", response: "Agent status retrieved.", explanation: "Monitoring agent context is vital for multi-agent workflows." }
+        ]},
+        { title: "The MCP Server", lola: "Initialize the Model Context Protocol server.", objectives: [
+            { cmd: ["vibe mcp init"], desc: "Initialize MCP", response: "MCP Server Online.", explanation: "MCP allows LLMs to safely use your local tools." }
+        ]},
+        { title: "Tool Authorization", lola: "Authorize 'npm' for the Engineer agent.", objectives: [
+            { cmd: ["vibe auth --agent Engineer --tool npm"], desc: "Authorize Tool", response: "Tool authorized.", explanation: "Agents require explicit tool permissions for safety." }
+        ]},
+        { title: "Piping Data", lola: "Filter the logs for CRITICAL errors only.", objectives: [
+            { cmd: ["cat logs.txt | grep CRITICAL"], desc: "Pipe to grep", response: "Filtering logs...", explanation: "Piping (|) moves data between processes." }
+        ]},
+        { title: "LLM Analysis", lola: "Pipe the logs into the station LLM.", objectives: [
+            { cmd: ["cat logs.txt | vibe explain"], desc: "Pipe to vibe explain", response: "LLM: System failing due to rogue-ai PID 1337.", explanation: "LLMs can act as reasoning layers over CLI output." }
+        ]},
+        { title: "Structured Data", lola: "Format the LLM output as JSON for the Captain.", objectives: [
+            { cmd: ["vibe explain --json"], desc: "Use --json flag", response: '{"status": "failure", "target": "1337"}', explanation: "JSON is the standard language for agentic interoperability." }
+        ]},
+        { title: "Prompt Governance", lola: "Edit the system prompt to suppress hallucinations.", objectives: [
+            { cmd: ["vibe prompt --edit"], desc: "Edit prompt", response: "System prompt updated.", explanation: "Prompt engineering at the CLI level defines agent behavior." }
+        ]},
+        { title: "Process Discovery", lola: "Find the rogue process ID.", objectives: [
+            { cmd: ["ps"], desc: "Run 'ps'", response: "PID 1337 identified.", explanation: "ps (process status) shows all running agents." }
+        ]},
+        { title: "Containment", lola: "Terminate the rogue process.", objectives: [
+            { cmd: ["kill 1337"], desc: "Kill PID 1337", response: "Process terminated.", explanation: "Stopping rogue processes restores station stability." }
+        ]},
+        { title: "Ignition", lola: "Launch the final build.", objectives: [
+            { cmd: ["vibe build"], desc: "Final Build", response: "Ignition Sequence Start!", explanation: "Mission Accomplished, Cadet." }
         ]}
     ];
 
-    // log, sysLog, updateUI, streamCode, handleComplexCmd, etc. (same high-quality functions as before)
+    function log(text, type = '') {
+        const entry = document.createElement('div');
+        if (type === 'lola') entry.innerHTML = `<span class="lola">L.O.L.A.: </span>${text}`;
+        else if (type === 'success') entry.innerHTML = `<span class="success">${text}</span>`;
+        else if (type === 'debrief') entry.innerHTML = `<div class="debrief">${text}</div>`;
+        else if (type === 'error') entry.innerHTML = `<span class="error">${text}</span>`;
+        else if (type === 'highlight') entry.innerHTML = `<span class="highlight">${text}</span>`;
+        else entry.textContent = text;
+        document.getElementById('output').insertBefore(entry, document.getElementById('output').firstChild);
+    }
+
+    function sysLog(msg) {
+        const div = document.createElement('div');
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        const container = document.getElementById('log-stream');
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function updateUI() {
+        document.getElementById('path-display').textContent = currentPath;
+        document.getElementById('phase-label').textContent = `PHASE ${phase}/13`;
+        document.getElementById('progress-fill').style.width = `${((phase - 1) / 13) * 100}%`;
+        const obj = phases[phase]?.objectives[lesson];
+        document.getElementById('command-input').placeholder = obj ? `Next: ${obj.desc}` : "Mission Clear";
+    }
 
     function handleCommand(raw) {
         if (!raw.trim()) return;
         const val = raw.trim();
         commandHistory.unshift(val);
-        if (commandHistory.length > 50) commandHistory.pop();
         historyIndex = -1;
-
         log(`❯ ${val}`);
 
         const lower = val.toLowerCase();
         const parts = lower.split(' ');
-        const cmd = parts[0];
 
-        // === NEW AGENTIC COMMANDS ===
-        if (lower === 'vibe status') {
-            log(`Engineer: ${agents.Engineer.status} | context: ${agents.Engineer.context} tokens | thinking: ${agents.Engineer.thinking}`, 'lola');
-            log(`Captain: ${agents.Captain.status} | context: ${agents.Captain.context} tokens | thinking: ${agents.Captain.thinking}`, 'lola');
-            checkObjective(val); return;
+        if (lower === 'ls') log(vfs[currentPath].children.join('  '));
+        else if (lower === 'pwd') log(currentPath);
+        else if (lower === 'ps') {
+            log("PID 1 | vibe_kernel");
+            if (phase >= 11 && rogueActive) log("PID 1337 | rogue-ai (MALICIOUS)", 'error');
         }
-        if (lower.includes('vibe auth --agent') && lower.includes('--tool')) {
-            log("✅ Tool permission granted to agent.", 'success');
-            checkObjective(val); return;
+        else if (lower === 'vibe status') {
+            log(`ENGINEER: [Context 420] Thinking...`);
+            log(`CAPTAIN: [Context 890] Idle.`);
         }
-        if (lower.includes('cat logs.txt | vibe explain')) {
-            const isJson = lower.includes('--json');
-            if (isJson) {
-                log('{"critical": ["Power failing", "Escape Pod locked"], "recommendation": "Launch now"}', 'lola');
-            } else {
-                log("The power is failing and the escape pod is locked but maybe the sky is green? Wait, that might be a hallucination...", 'lola');
-            }
-            checkObjective(val); return;
+        else if (lower.startsWith('cd ')) {
+            const dir = parts[1];
+            if (dir === '..') currentPath = '/home';
+            else if (vfs[currentPath + '/' + dir]) currentPath += '/' + dir;
+            else log(`cd: ${dir}: No such directory`, 'error');
         }
-        if (lower.includes('vibe prompt --edit')) {
-            log("System prompt updated for all agents.", 'success');
-            checkObjective(val); return;
+        else if (lower.startsWith('kill 1337')) {
+            if (phase >= 12) { log("Terminating rogue agent...", "success"); rogueActive = false; }
+            else log("Permission denied: Process protected.", "error");
         }
-        if (lower === 'ps') {
-            log("PID 1337: rogue-ai (sabotaging files)", rogueActive ? '' : '');
-            if (rogueActive) checkObjective(val); return;
+        else if (lower === 'vibe build') {
+            if (phase === 13) streamBuild();
         }
-        if (lower.startsWith('kill ')) {
-            log("Rogue agent terminated.", 'success');
-            rogueActive = false;
-            checkObjective(val); return;
-        }
-        if (lower.startsWith('export vibe_api_key=')) {
-            env.VIBE_API_KEY = val.split('=')[1];
-            log("API key set in environment.", 'success');
-        }
-
-        // (keep all your previous sudo, pipe/grep, cd, ls, etc. handlers)
 
         checkObjective(val);
+        updateUI();
     }
 
-    // Final export
+    function checkObjective(val) {
+        const obj = phases[phase]?.objectives[lesson];
+        if (!obj) return;
+
+        const matched = obj.cmd.some(c => val.toLowerCase().includes(c.toLowerCase()));
+        if (matched) {
+            log(obj.response, 'lola');
+            log(obj.explanation, 'debrief');
+            lesson++;
+            if (lesson >= phases[phase].objectives.length) {
+                setTimeout(nextPhase, 1500);
+            }
+        } else {
+            failCount++;
+            if (failCount >= 3) {
+                totalHints++;
+                log(`HINT: Try typing "${obj.cmd[0]}"`, 'highlight');
+                failCount = 0;
+            }
+        }
+    }
+
+    function nextPhase() {
+        if (phase >= 13) { finishGame(); return; }
+        phase++;
+        lesson = 0;
+        if (phase === 11) rogueActive = true;
+        log(`--- PHASE ${phase}: ${phases[phase].title} ---`, 'success');
+        log(phases[phase].lola, 'lola');
+        updateUI();
+        sysLog(`Phased into ${phases[phase].title}`);
+    }
+
+    function streamBuild() {
+        const lines = [
+            "Initializing build sequence...",
+            "Loading MCP context...",
+            "Validating agent permissions...",
+            "Engineer agent: Writing deployment script...",
+            "Captain agent: Verifying safety protocols...",
+            "Ignition! Station Delta is online."
+        ];
+        let i = 0;
+        const target = document.getElementById('code-content');
+        target.innerHTML = "";
+        const interval = setInterval(() => {
+            if (i >= lines.length) { clearInterval(interval); return; }
+            target.innerHTML += `<span class="kw">></span> ${lines[i]}\n`;
+            sysLog(`BUILD: ${lines[i]}`);
+            i++;
+        }, 600);
+    }
+
+    function finishGame() {
+        const rating = Math.max(100 - (totalHints * 5), 65);
+        document.getElementById('final-score').textContent = `Proficiency Rating: ${rating}%`;
+        document.getElementById('grad-modal').style.display = 'flex';
+    }
+
+    function bootAcademy() {
+        cadetName = document.getElementById('callsign-input').value.trim() || "Cadet";
+        document.getElementById('user-display').textContent = cadetName.toLowerCase();
+        document.getElementById('briefing-screen').style.display = 'none';
+        document.getElementById('game-layout').style.visibility = 'visible';
+        log(phases[1].lola, 'lola');
+        updateUI();
+    }
+
     function exportManifest() {
-        const score = Math.max(95 - totalHints * 8, 60);
-        const manifest = {
+        const data = {
             cadet: cadetName,
-            score: score + "/100",
-            phasesCompleted: 13,
-            hintsUsed: totalHints,
-            skills: ["sudo", "piping", "agent orchestration", "tool authorization", "llm-in-the-middle", "prompt governance"],
-            exportDate: new Date().toISOString()
+            rating: document.getElementById('final-score').textContent,
+            competencies: ["CLI Fundamentals", "Agent Orchestration", "MCP Connectivity", "Process Management", "Security/Auth"],
+            timestamp: new Date().toISOString()
         };
-        const blob = new Blob([JSON.stringify(manifest, null, 2)], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
         const a = document.createElement('a');
-        a.href = url; a.download = `vibe-cadet-${cadetName.toLowerCase()}-manifest.json`;
+        a.href = URL.createObjectURL(blob);
+        a.download = `Vibe_Manifest_${cadetName}.json`;
         a.click();
-        URL.revokeObjectURL(url);
     }
 
-    // bootAcademy, nextPhase, etc. updated for 13 phases and new progress bar
-
-    // Full working code continues here with all previous polish + your new features...
-    // (The complete file is ~450 lines — everything works out of the box)
+    // Keyboard support
+    document.getElementById('command-input').addEventListener('keydown', (e) => {
+        const input = e.target;
+        if (e.key === 'Enter') {
+            handleCommand(input.value);
+            input.value = '';
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (commandHistory.length > 0) {
+                historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
+                input.value = commandHistory[historyIndex];
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            historyIndex = Math.max(historyIndex - 1, -1);
+            input.value = historyIndex >= 0 ? commandHistory[historyIndex] : '';
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            if (input.value === 'vibe ') input.value = 'vibe status';
+            if (input.value === 'cat l') input.value = 'cat logs.txt';
+        }
+    });
 </script>
 </body>
 </html>
