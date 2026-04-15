@@ -18,56 +18,28 @@
             --fn-color: #d2a8ff;
             --font-family: 'Fira Code', 'Courier New', monospace;
         }
-
-        body {
-            background-color: #010409;
-            color: var(--text-color);
-            font-family: var(--font-family);
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-        }
-
-        #academy-bar {
-            height: 40px; background: #161b22; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; padding: 0 20px; gap: 20px; font-size: 0.8rem;
-        }
-        #progress-fill {
-            height: 4px; background: linear-gradient(90deg, var(--accent-color), #58a6ff);
-            width: 0%; transition: width 0.5s; box-shadow: 0 0 10px var(--accent-color);
-        }
-
-        #game-layout {
-            display: grid; grid-template-columns: 1fr 380px; grid-template-rows: 1fr 180px;
-            gap: 10px; padding: 10px; flex-grow: 1; visibility: hidden;
-        }
-
-        .pane { background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
-        .pane-header { background: #161b22; padding: 8px 12px; font-size: 0.7rem; color: #8b949e; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-
-        #output { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column-reverse; font-size: 0.95rem; line-height: 1.6; }
-        .prompt-line { display: flex; padding: 12px; background: #0d1117; border-top: 1px solid var(--border); }
-        #command-input { flex-grow: 1; background: transparent; border: none; color: #fff; outline: none; font-family: inherit; font-size: 1rem; }
-
-        #code-content { padding: 15px; font-size: 0.85rem; white-space: pre-wrap; color: #d1d5da; line-height: 1.4; overflow-y: auto; }
-        #log-stream { padding: 10px; font-size: 0.75rem; color: #8b949e; overflow-y: auto; }
-
-        .modal { position: fixed; inset: 0; background: rgba(1,4,9,0.98); z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: #161b22; border: 1px solid var(--accent-color); padding: 40px; max-width: 600px; border-radius: 12px; text-align: left; box-shadow: 0 0 30px rgba(46,160,67,0.2); }
-
-        .lola { color: var(--accent-color); font-weight: bold; }
-        .error { color: var(--error-color); }
-        .success { color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); }
-        .highlight { color: var(--highlight-color); font-weight: bold; }
-        .kw { color: var(--kw-color); } .str { color: var(--str-color); } .fn { color: var(--fn-color); } .comment { color: #6a737d; font-style: italic; }
-
-        .glitch { animation: glitch 0.2s infinite; }
-        @keyframes glitch { 0% { transform: translate(0); } 50% { transform: translate(-2px, 2px); background: rgba(255,0,0,0.1); } 100% { transform: translate(0); } }
+        body { background-color: #010409; color: var(--text-color); font-family: var(--font-family); margin:0; height:100vh; display:flex; flex-direction:column; overflow:hidden;
+               background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+               background-size: 100% 2px, 3px 100%; }
+        #academy-bar { height:40px; background:#161b22; border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:20px; font-size:0.8rem; }
+        #progress-fill { height:4px; background:linear-gradient(90deg, var(--accent-color), #58a6ff); width:0%; transition:width 0.5s; box-shadow:0 0 10px var(--accent-color); }
+        #game-layout { display:grid; grid-template-columns:1fr 380px; grid-template-rows:1fr 180px; gap:10px; padding:10px; flex-grow:1; visibility:hidden; }
+        .pane { background:var(--bg-color); border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; overflow:hidden; }
+        .pane-header { background:#161b22; padding:8px 12px; font-size:0.7rem; color:#8b949e; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; }
+        #output { flex-grow:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column-reverse; font-size:0.95rem; line-height:1.6; }
+        .prompt-line { display:flex; padding:12px; background:#0d1117; border-top:1px solid var(--border); }
+        #command-input { flex-grow:1; background:transparent; border:none; color:#fff; outline:none; font-family:inherit; font-size:1rem; }
+        #code-content { padding:15px; font-size:0.85rem; white-space:pre-wrap; color:#d1d5da; line-height:1.4; overflow-y:auto; }
+        #log-stream { padding:10px; font-size:0.75rem; color:#8b949e; overflow-y:auto; }
+        .modal { position:fixed; inset:0; background:rgba(1,4,9,0.98); z-index:2000; display:flex; align-items:center; justify-content:center; }
+        .modal-content { background:#161b22; border:1px solid var(--accent-color); padding:40px; max-width:600px; border-radius:12px; text-align:left; box-shadow:0 0 30px rgba(46,160,67,0.2); }
+        .lola { color:var(--accent-color); font-weight:bold; }
+        .error { color:var(--error-color); }
+        .success { color:var(--accent-color); text-shadow:0 0 5px var(--accent-color); }
+        .highlight { color:var(--highlight-color); font-weight:bold; }
+        .debrief { background:rgba(46,160,67,0.1); border-left:4px solid var(--accent-color); padding:12px; margin:8px 0; }
+        .glitch { animation:glitch 0.2s infinite; }
+        @keyframes glitch { 0% { transform:translate(0); } 50% { transform:translate(-2px,2px); background:rgba(255,0,0,0.1); } 100% { transform:translate(0); } }
     </style>
 </head>
 <body onclick="document.getElementById('command-input').focus()">
@@ -75,17 +47,11 @@
 <div id="briefing-screen" class="modal">
     <div class="modal-content">
         <h1 style="color:var(--accent-color); margin-top:0;">📡 INCOMING TRANSMISSION</h1>
-        <p style="line-height:1.6; font-size: 1.1rem;">
-            The year is 2026. The <span class="highlight">Vibe-Station Delta</span> has gone dark. 
-            The Automated Fleet is paralyzed. We need a Cadet who can speak the language of the machine—<span class="highlight">The CLI</span>.
-        </p>
-        <p style="color:#8b949e;">
-            <strong>Your Mission:</strong> Navigate the station's file system, initialize the AI Command Crew, and build the Escape Pod landing page to bring the survivors home.
-        </p>
-        <div style="margin-top:30px; border-top: 1px solid var(--border); padding-top:20px;">
-            <label style="display:block; margin-bottom:10px; font-size:0.8rem; color:var(--prompt-color);">ENTER CALLSIGN TO INITIALIZE:</label>
-            <input type="text" id="callsign-input" placeholder="e.g. Maverick" 
-                   style="background:#0d1117; border:1px solid var(--border); color:white; padding:12px; width:100%; border-radius:6px; font-family:inherit;">
+        <p style="line-height:1.6; font-size:1.1rem;">The year is 2026. Vibe-Station Delta has gone dark. We need a Cadet who speaks fluent <span class="highlight">CLI</span>.</p>
+        <p><strong>Your Mission:</strong> Master the command line, restore the station, and launch the Escape Pod.</p>
+        <div style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
+            <label style="display:block; margin-bottom:10px; font-size:0.8rem; color:var(--prompt-color);">ENTER CALLSIGN:</label>
+            <input type="text" id="callsign-input" placeholder="e.g. Maverick" style="background:#0d1117; border:1px solid var(--border); color:white; padding:12px; width:100%; border-radius:6px; font-family:inherit;">
             <button onclick="bootAcademy()" style="margin-top:20px; width:100%; padding:15px; background:var(--accent-color); border:none; color:#010409; font-weight:bold; border-radius:6px; cursor:pointer;">ACCEPT MISSION</button>
         </div>
     </div>
@@ -107,7 +73,7 @@
         <div id="output"></div>
         <div class="prompt-line">
             <span style="color:var(--prompt-color); margin-right:8px;">❯</span>
-            <input type="text" id="command-input" spellcheck="false" autocomplete="off" placeholder="Tab to complete...">
+            <input type="text" id="command-input" spellcheck="false" autocomplete="off" placeholder="Type man for help...">
         </div>
     </div>
 
@@ -124,9 +90,9 @@
 
 <div id="grad-modal" class="modal" style="display:none;">
     <div class="modal-content" style="text-align:center;">
-        <h1 class="success">🎖️ MISSION COMPLETE</h1>
-        <p>The Escape Pod has launched. Station Delta is secure.</p>
-        <button onclick="location.reload()" style="padding:12px 24px; cursor:pointer;">REBOOT</button>
+        <h1 class="success">🎖️ MISSION COMPLETE — YOU ARE NOW CLI FLUENT</h1>
+        <p>You saved Station Delta. Share your achievement with friends!</p>
+        <button onclick="location.reload()" style="padding:12px 24px; cursor:pointer;">REBOOT ACADEMY</button>
     </div>
 </div>
 
@@ -134,41 +100,59 @@
     let cadetName = "Cadet";
     let currentPath = '/home';
     let phase = 1, lesson = 0;
+    let failCount = 0;
+    let commandHistory = [];
+    let historyIndex = -1;
 
     const vfs = {
-        '/home': { type: 'dir', children: ['projects', 'README.txt'] },
-        '/home/README.txt': { type: 'file', content: 'Vibe Terminal v2.9' },
+        '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt'] },
+        '/home/README.txt': { type: 'file', content: 'Welcome to Vibe-Station Delta. Master the CLI to survive.' },
+        '/home/manual.txt': { type: 'file', content: 'Pro tip: Type "man <command>" for real explanations.' },
         '/home/projects': { type: 'dir', children: ['game_v1'] },
-        '/home/projects/game_v1': { type: 'dir', children: [] }
+        '/home/projects/game_v1': { type: 'dir', children: ['main.js'] },
+        '/home/projects/game_v1/main.js': { type: 'file', content: 'console.log("Escape Pod ready!");' }
+    };
+
+    const helpDB = {
+        'ls': { desc: 'List directory contents', why: 'Shows you what files and folders are here — the most-used command in the terminal.' },
+        'cd': { desc: 'Change directory', why: 'Moves you between folders. Without it you’re stuck in one place.' },
+        'pwd': { desc: 'Print working directory', why: 'Tells you exactly where you are in the filesystem.' },
+        'cat': { desc: 'Concatenate / view file', why: 'Reads the content of a file — like opening a document without a GUI.' },
+        'mkdir': { desc: 'Make directory', why: 'Creates new folders to organize your work.' },
+        'touch': { desc: 'Create empty file', why: 'Quick way to create new files.' },
+        'git': { desc: 'Version control', why: 'Tracks changes so you can undo mistakes and work with teams safely.' }
     };
 
     const phases = [
         null,
-        { title: "Orientation", lola: "Systems are cold. Before we begin, you must learn to access the station's Field Manual.", objectives: [
-            { cmd: ["man", "manual"], desc: "Type 'man' to open the Field Manual", response: "Manual accessed. Authorization granted." },
-            { cmd: ["ls"], desc: "List files to see your surroundings", response: "Directory listing retrieved." },
-            { cmd: ["cd projects"], desc: "Enter the 'projects' directory", response: "Navigated to /home/projects." }
+        { title: "Orientation", lola: "Systems are cold. Let's learn to see where we are.", objectives: [
+            { cmd: ["ls"], desc: "Type ls to list files", response: "Directory contents listed.", explanation: "ls shows you everything in the current folder. Real developers use this constantly to know what's around them." },
+            { cmd: ["pwd"], desc: "Type pwd to see current location", response: "Current path displayed.", explanation: "pwd = Print Working Directory. It answers 'where am I?' — super useful when you're lost in a big project." },
+            { cmd: ["cat README.txt"], desc: "Type cat README.txt", response: "File read.", explanation: "cat lets you read files directly in the terminal. No need for a text editor just to peek inside." }
         ]},
-        { title: "The Workspace", lola: "Move into the active development folder.", objectives: [
-            { cmd: ["cd game_v1"], desc: "Enter 'game_v1' using 'cd game_v1'", response: "Inside the workspace." }
+        { title: "Navigation", lola: "Time to move around the station.", objectives: [
+            { cmd: ["cd projects"], desc: "cd into projects", response: "Navigated to projects.", explanation: "cd changes your current directory. You will use this every single day as a developer." },
+            { cmd: ["cd game_v1"], desc: "cd into game_v1", response: "Now inside the workspace.", explanation: "You can chain navigation commands. Real projects have many nested folders." }
         ]},
-        { title: "Source Control", lola: "We need to track our changes. Initialize the repository.", objectives: [
-            { cmd: ["git init"], desc: "Type 'git init' to start tracking", response: "Git repository initialized." }
+        { title: "Creation", lola: "Let's build something.", objectives: [
+            { cmd: ["mkdir backup"], desc: "mkdir backup", response: "Backup folder created.", explanation: "mkdir creates new directories. Organizing files is a core skill." },
+            { cmd: ["touch log.txt"], desc: "touch log.txt", response: "File created.", explanation: "touch quickly creates empty files — perfect for starting new notes or scripts." }
         ]},
-        { title: "Dependency Sync", lola: "Sync the station's core libraries.", objectives: [
-            { cmd: ["bun install"], desc: "Run 'bun install'", response: "Packages synced via Bun." }
+        { title: "Source Control", lola: "We need memory. Initialize git.", objectives: [
+            { cmd: ["git init"], desc: "git init", response: "Repository initialized.", explanation: "git init creates a hidden folder that remembers every change you make." },
+            { cmd: ["git status"], desc: "git status", response: "Status checked.", explanation: "git status shows you what changed. Developers check this constantly." }
         ]},
-        { title: "Engineering", lola: "We need a Specialist to handle the mechanics.", objectives: [
-            { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create Specialist: 'vibe create --role specialist --name Engineer'", response: "Engineer is now ACTIVE." }
+        { title: "Dependency Sync", lola: "Sync the core libraries.", objectives: [
+            { cmd: ["bun install"], desc: "bun install", response: "Packages synced.", explanation: "Modern package managers like Bun/npm install libraries your project needs." }
         ]},
-        { title: "Command", lola: "We need a Manager to coordinate the escape.", objectives: [
-            { cmd: ["vibe create --role manager --name Captain"], desc: "Create Manager: 'vibe create --role manager --name Captain'", response: "Captain is now ACTIVE." }
+        { title: "Engineering", lola: "Create the Engineer specialist.", objectives: [
+            { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create Engineer", response: "Engineer is now ACTIVE.", explanation: "This is a station-specific command, but it mirrors how real teams assign roles and responsibilities." }
         ]},
-        { title: "The Briefing", lola: "Talk to the Captain before we launch.", objectives: [
-            { cmd: ["prompt agent Captain"], desc: "Type 'prompt agent Captain'", response: "Captain: We are ready for the build sequence." }
+        { title: "Command", lola: "Create the Captain.", objectives: [
+            { cmd: ["vibe create --role manager --name Captain"], desc: "Create Captain", response: "Captain is now ACTIVE.", explanation: "Same pattern as before — you’re learning how to manage multiple agents via CLI." }
         ]},
-        { title: "The Build", lola: "Initiate the final build of the Escape Pod.", objectives: [
-            { cmd: ["vibe build"], desc: "Run 'vibe build' to trigger the stream", response: "Final build sequence initiated..." }
+        { title: "Launch", lola: "Final build sequence.", objectives: [
+            { cmd: ["vibe build"], desc: "vibe build", response: "Build initiated...", explanation: "In real life this is like running npm run build or cargo build — it packages everything for deployment." }
         ]}
     ];
 
@@ -185,8 +169,9 @@
         if (type === 'lola') entry.innerHTML = `<span class="lola">L.O.L.A.: </span>${text}`;
         else if (type === 'success') entry.innerHTML = `<span class="success">${text}</span>`;
         else if (type === 'highlight') entry.innerHTML = `<span class="highlight">MISSION: </span>${text}`;
+        else if (type === 'debrief') entry.innerHTML = `<div class="debrief">${text}</div>`;
         else entry.textContent = text;
-        document.getElementById('output').insertBefore(entry, output.firstChild);
+        document.getElementById('output').insertBefore(entry, document.getElementById('output').firstChild);
     }
 
     function sysLog(text) {
@@ -196,89 +181,126 @@
         document.getElementById('log-stream').scrollTop = 9999;
     }
 
-    function handleTab(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const val = e.target.value.trim().split(' ');
-            const last = val[val.length - 1];
-            const match = vfs[currentPath]?.children?.find(i => i.startsWith(last));
-            if (match) { val[val.length - 1] = match; e.target.value = val.join(' '); }
-        }
-    }
-
     function updateUI() {
         document.getElementById('path-display').textContent = currentPath;
         document.getElementById('phase-label').textContent = `PHASE ${phase}/8`;
         document.getElementById('progress-fill').style.width = `${((phase - 1) / 7) * 100}%`;
-        
         const obj = phases[phase]?.objectives[lesson];
-        document.getElementById('command-input').placeholder = obj ? `Next: ${obj.desc}...` : "Type 'man' for help...";
+        document.getElementById('command-input').placeholder = obj ? `Next: ${obj.desc}` : "Type man <command> for help...";
     }
 
     function streamCode() {
         const snippet = ["import { EscapePod } from 'vibe-os';", "const pod = new EscapePod();", "pod.prepareLaunch();", "pod.on('ready', () => {", "  pod.launch();", "});"];
         let i = 0;
-        document.getElementById('code-content').innerHTML = highlight("// Initiating build...\n");
+        document.getElementById('code-content').innerHTML = highlight("// Final build sequence...\n");
         const interval = setInterval(() => {
             document.getElementById('code-content').innerHTML += highlight(snippet[i] + "\n");
             sysLog(`AGENT: Writing module ${i+1}...`);
             i++;
-            if (i >= snippet.length) { clearInterval(interval); log("MISSION ACCOMPLISHED.", "success"); setTimeout(nextPhase, 1000); }
-        }, 300);
+            if (i >= snippet.length) {
+                clearInterval(interval);
+                log("MISSION ACCOMPLISHED. Escape Pod launched.", "success");
+                setTimeout(nextPhase, 800);
+            }
+        }, 280);
     }
 
     function handleCommand(raw) {
         if (!raw.trim()) return;
         const val = raw.trim();
+        commandHistory.unshift(val);
+        if (commandHistory.length > 50) commandHistory.pop();
+        historyIndex = -1;
+
+        log(`❯ ${val}`);
+
         const parts = val.split(' ');
         const cmd = parts[0].toLowerCase();
-        const arg = parts[1];
 
-        log(`❯ ${val}`, 'cmd');
-
+        // Easter egg
         if (val.replace(/\s/g, "") === "sudorm-rf/") {
             document.body.classList.add('glitch');
-            log("CRITICAL: ROOT DELETED. REBOOTING...", "error");
-            setTimeout(() => location.reload(), 1500); return;
-        }
-
-        if (cmd === 'help' || cmd === 'man' || cmd === 'manual') {
-            log("=== VIBE_OS FIELD MANUAL ===", "highlight");
-            log("- NAVIGATION: 'ls' (list), 'cd [folder]' (move)");
-            log("- SYSTEM: 'vibe', 'git', 'bun'");
-            log("- AGENTS: 'vibe create --role [role] --name [name]'");
-            log("- TALK: 'prompt agent [name]'");
-            log(`- CURRENT TASK: ${phases[phase].objectives[lesson].desc}`, "success");
+            log("CRITICAL ERROR: ROOT DELETED", "error");
+            setTimeout(() => location.reload(), 1500);
             return;
         }
 
+        // Help / man
+        if (cmd === 'man' || cmd === 'help') {
+            const target = parts[1] || 'general';
+            if (helpDB[target]) {
+                log(`=== ${target.toUpperCase()} MANUAL ===`, "highlight");
+                log(helpDB[target].desc);
+                log(`Why it matters: ${helpDB[target].why}`);
+            } else {
+                log("=== VIBE_OS FIELD MANUAL ===", "highlight");
+                log("ls, cd, pwd, cat, mkdir, touch, git init/status");
+                log("Type 'man <command>' for detailed help.");
+            }
+            return;
+        }
+
+        // Basic commands
         if (cmd === 'ls') {
             log(vfs[currentPath].children.join('  '));
-        } else if (cmd === 'cd') {
-            let target = (!arg || arg === '..') ? '/home' : (!arg.startsWith('/') ? `${currentPath}/${arg}` : arg);
-            if (vfs[target]) currentPath = target; else log(`Error: ${arg} not found`, 'error');
-        } else if (cmd === 'vibe' && arg === 'build' && phase === 8) {
+            return;
+        }
+        if (cmd === 'pwd') {
+            log(currentPath);
+            return;
+        }
+        if (cmd === 'cat' && parts[1]) {
+            const filePath = currentPath + '/' + parts[1];
+            if (vfs[filePath]) log(vfs[filePath].content);
+            else log("File not found", "error");
+            return;
+        }
+        if (cmd === 'cd') {
+            let target = (!parts[1] || parts[1] === '..') ? '/home' : (parts[1].startsWith('/') ? parts[1] : `${currentPath}/${parts[1]}`);
+            if (vfs[target]) { currentPath = target; log(`Moved to ${currentPath}`); }
+            else log(`No such directory: ${parts[1]}`, "error");
+            updateUI();
+            return;
+        }
+        if (cmd === 'mkdir' && parts[1]) {
+            log(`Directory '${parts[1]}' created (simulated).`);
+            return;
+        }
+        if (cmd === 'touch' && parts[1]) {
+            log(`File '${parts[1]}' created (simulated).`);
+            return;
+        }
+        if (cmd === 'git' && parts[1] === 'init') {
+            log("Repository initialized.");
+            return;
+        }
+        if (cmd === 'git' && parts[1] === 'status') {
+            log("On branch main. Nothing to commit.");
+            return;
+        }
+        if (cmd === 'vibe' && parts[1] === 'build' && phase === 8) {
             streamCode();
             return;
         }
 
-        // PROGRESS CHECK - now more flexible for vibe create commands
+        // Progress check with explanation
         const obj = phases[phase]?.objectives[lesson];
         if (obj) {
-            const lowerVal = val.toLowerCase();
             let matched = false;
-
-            if (lowerVal.includes("vibe create") && lowerVal.includes("role") && lowerVal.includes("name")) {
-                matched = true; // Flexible match for any vibe create command
-            } else if (obj.cmd.some(c => lowerVal.includes(c))) {
-                matched = true;
-            }
+            const lowerVal = val.toLowerCase();
+            if (obj.cmd.some(c => lowerVal.includes(c.toLowerCase()))) matched = true;
+            else if (lowerVal.includes("vibe create")) matched = true;
 
             if (matched) {
+                failCount = 0;
                 log(obj.response, 'lola');
+                log(obj.explanation, 'lola');
                 lesson++;
+
                 if (lesson >= phases[phase].objectives.length) {
-                    nextPhase();
+                    log(`\n--- PHASE COMPLETE: ${phases[phase].title} ---`, 'success');
+                    log("Great work, Cadet. Here's what you learned:", 'debrief');
+                    setTimeout(nextPhase, 1200);
                 } else {
                     updateUI();
                 }
@@ -286,25 +308,29 @@
             }
         }
 
-        if (cmd !== 'ls' && cmd !== 'cd') {
-            log(`Invalid. Hint: Type 'man' for instructions.`, 'error');
+        failCount++;
+        if (failCount >= 2) {
+            log(`Hint: Try typing "man ${cmd || 'ls'}" or check the current objective.`, 'highlight');
+            failCount = 0;
+        } else {
+            log("Command not recognized for this phase. Type 'man' for help.", "error");
         }
     }
 
     function nextPhase() {
         phase++;
         lesson = 0;
+        failCount = 0;
         if (phase > 8) {
             document.getElementById('grad-modal').style.display = 'flex';
         } else {
-            log(`\n--- PHASE ${phase}: ${phases[phase].title} ---`, 'success');
             log(phases[phase].lola, 'lola');
             updateUI();
         }
     }
 
     function bootAcademy() {
-        cadetName = document.getElementById('callsign-input').value || "Cadet";
+        cadetName = document.getElementById('callsign-input').value.trim() || "Cadet";
         document.getElementById('user-display').textContent = cadetName.toLowerCase();
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
@@ -314,15 +340,38 @@
     }
 
     function showAchievements() {
-        alert("🏆 Achievements coming in the next update!");
+        alert("🏆 Achievements unlocked:\n• First Steps\n• Git Initiate\n• Escape Pod Engineer\n\nNext update will track real progress!");
     }
 
+    // Command history (Up / Down arrows)
     document.getElementById('command-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { 
-            handleCommand(e.target.value); 
-            e.target.value = ''; 
+        if (e.key === 'Enter') {
+            handleCommand(e.target.value);
+            e.target.value = '';
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (commandHistory.length > 0) {
+                historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
+                e.target.value = commandHistory[historyIndex];
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex > 0) {
+                historyIndex--;
+                e.target.value = commandHistory[historyIndex];
+            } else {
+                historyIndex = -1;
+                e.target.value = '';
+            }
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            // simple tab complete (existing logic)
+            const val = e.target.value.trim().split(' ');
+            const last = val[val.length - 1];
+            const match = vfs[currentPath]?.children?.find(i => i.startsWith(last));
+            if (match) val[val.length - 1] = match;
+            e.target.value = val.join(' ');
         }
-        handleTab(e);
     });
 </script>
 </body>
