@@ -158,13 +158,23 @@
         { title: "MCP Init", lola: "We need a bridge between our logic and our tools. Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a real-world standard that lets AI agents use local tools safely." }] },
         { title: "Tool Authorization", lola: "AI Agents shouldn't have power without permission. Use **'vibe auth'** to give the 'Engineer' agent access to the 'npm' tool. Type: **'vibe auth --agent Engineer --tool npm'**", objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "Type the full auth command", response: "Authorized.", explanation: "Explicit authorization prevents AI from making accidental changes." }] },
         { 
-            title: "Piping Logs", 
-            lola: "The logs are too messy. We need to 'pipe' the data through a filter. Use the **'|'** (Pipe) symbol and **'grep'** to find 'CRITICAL' errors. Type: **'cat logs.txt | grep CRITICAL'**", 
-            objectives: [
-                { cmd: ["cat logs.txt"], desc: "Type 'cat logs.txt'", response: "Ugh, too much noise. Filter it for 'CRITICAL'.", explanation: "Information overload is a real threat. You need a filter." },
-                { cmd: ["cat logs.txt | grep CRITICAL"], desc: "Use the pipe '|' symbol", response: "Power failing!", explanation: "The pipe '|' takes the output of one command and sends it to another." }
-            ] 
+    title: "Data Stream Orchestration", 
+    lola: "The logs are a flood of noise, Cadet. To find the signal, we use the **'|' (Pipe)**. It takes the output of one command and feeds it directly into the next as input.", 
+    objectives: [
+        { 
+            cmd: ["cat logs.txt"], 
+            desc: "Type 'cat logs.txt'", 
+            response: "See that wall of text? That's 'Standard Output'. It's useless to a human in that volume.", 
+            explanation: "Raw data is like unrefined oil—it needs a pipeline to become useful." 
         },
+        { 
+            cmd: ["cat logs.txt | grep CRITICAL"], 
+            desc: "Use the pipe '|' symbol", 
+            response: "Power failing! You just built your first data pipeline.", 
+            explanation: "The Pipe ('|') is the 'glue' of the system. By piping 'cat' into 'grep', you filtered thousands of lines of noise into two lines of actionable intelligence." 
+        }
+    ] 
+},
         { title: "LLM Reasoning", lola: "Now, let's ask the AI to explain those logs. Pipe the logs into our reasoning tool: **'cat logs.txt | vibe explain'**", objectives: [{ cmd: ["cat logs.txt | vibe explain"], desc: "Pipe logs to vibe explain", response: "PID 1337!", explanation: "Using an LLM to filter terminal output is a core part of modern AI automation." }] },
         { title: "Structured Info", lola: "AI agents communicate best with clean data. Add the **'--json'** flag to get a computer-readable explanation. Type: **'vibe explain --json'**", objectives: [{ cmd: ["vibe explain --json"], desc: "Add the --json flag", response: '{"target": "1337"}', explanation: "JSON is the universal language of the internet." }] },
         { title: "Prompt Governance", lola: "Our AI is hallucinating. We need to edit the **System Prompt**. Type: **'vibe prompt --edit'**", objectives: [{ cmd: ["vibe prompt --edit"], desc: "Type 'vibe prompt --edit'", response: "Fixed.", explanation: "A System Prompt is the personality and rules you give an AI to keep it on track." }] },
