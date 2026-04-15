@@ -211,6 +211,15 @@
         }
 
         // Core commands
+        if (lower === 'help') {
+            const currentObj = phases[state.phase].objectives[state.lesson];
+            log(`=== EMERGENCY ASSISTANCE ===`, 'highlight');
+            log(`CURRENT PHASE: ${state.phase} - ${phases[state.phase].title}`);
+            log(`GOAL: ${currentObj.desc}`, 'success');
+            log(`HINT: ${currentObj.explanation}`);
+            log(`COMMANDS: ls, pwd, cd, cat, man, vibe, sudo`, 'highlight');
+            return;
+        }
         if (lower.startsWith('man ')) {
             const cmd = lower.split(' ')[1];
             if (helpDB[cmd]) {
@@ -307,7 +316,7 @@
         document.getElementById('user-display').innerText = state.cadetName;
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
-
+        document.getElementById('command-input').focus();
         log("Hello Cadet, I'm L.O.L.A. — your Logistics & Orchestration Liaison Assistant.", 'lola');
         log("I'll guide you through every command and explain why it matters in real-world AI workflows.", 'lola');
         log("Ready? Let's restore Station Delta.", 'lola');
