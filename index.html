@@ -118,10 +118,14 @@
     let currentPath = '/home';
     let rogueActive = false;
     let failCount = 0;
+    let commandHistory = [];
 
-    const asciiArt = { ghost: ` .---.\n/     \\\n| () () |  <-- ROGUE DETECTED (PID: 1337)\n \\  ^  /\n  |||||\n  ||||| ` };
+    const asciiArt = { 
+        ghost: ` .---.\n/     \\\n| () () |  <-- ROGUE DETECTED (PID: 1337)\n \\  ^  /\n  |||||\n  ||||| `,
+        sandwich: `   🔥\n  /   \\\n | 🍔  |\n  \\___/  ← sudo make me a sandwich`
+    };
 
-    const vfs = { /* unchanged - same as your version */ 
+    const vfs = {
         '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt', 'logs.txt', 'restrict_access.key'] },
         '/home/README.txt': { type: 'file', content: 'STATION DELTA: Emergency Protocol Active.' },
         '/home/manual.txt': { type: 'file', content: 'Pro tip: Type "man <command>" for technical specs.' },
@@ -132,7 +136,7 @@
         '/home/projects/game_v1/main.js': { type: 'file', content: 'console.log("Escape Pod ready!");' }
     };
 
-    const helpDB = { /* your improved version kept */ 
+    const helpDB = {
         'man': { desc: 'Display manual', why: 'Lists all available commands and their usage.' },
         'ls': { desc: 'List contents', why: 'Shows files/folders in your current location.' },
         'pwd': { desc: 'Print working directory', why: 'Tells you exactly where you are.' },
@@ -145,7 +149,7 @@
         'vibe': { desc: 'AI Orchestrator', why: 'Commands specifically for managing AI agents.' }
     };
 
-    const phases = [null, /* your updated phases kept exactly as you wrote them */ 
+    const phases = [null,
         { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your GPS." }] },
         { 
             title: "Privilege Escalation", 
@@ -206,9 +210,14 @@
         else if (type === 'success') entry.classList.add('success');
         else if (type === 'error') entry.classList.add('error');
         else if (type === 'highlight') entry.classList.add('highlight');
+        else if (type === 'matrix') entry.classList.add('matrix');
         else if (type === 'debrief') entry.innerHTML = `<div class="debrief">${text}</div>`;
         else entry.textContent = text;
         document.getElementById('output').insertBefore(entry, document.getElementById('output').firstChild);
+    }
+
+    function clearTerminal() {
+        document.getElementById('output').innerHTML = '';
     }
 
     function sysLog(msg) {
@@ -226,14 +235,90 @@
     function handleCommand(raw) {
         const val = raw.trim();
         if (!val) return;
+        commandHistory.unshift(val);
+        if (commandHistory.length > 20) commandHistory.pop();
+        
         log(`❯ ${val}`);
         const lower = val.toLowerCase();
 
+        // === EASTER EGGS FOR EXPERIENCED PROGRAMMERS ===
+        if (lower.includes('rm -rf') || lower.includes('rm -r /') || lower === 'rm -rf *') {
+            if (!lower.includes('sudo')) {
+                log("Permission denied. Nice try though.", "error");
+            } else {
+                log("CRITICAL: ROOT DELETION INITIALIZED", "error");
+                setTimeout(() => {
+                    document.getElementById('output').innerHTML = "";
+                    document.body.style.background = "#000";
+                    log("💥 FATAL ERROR: OS NOT FOUND 💥", "matrix");
+                    log("Station Delta has been... vaporized.", "error");
+                }, 1200);
+                setTimeout(() => {
+                    document.body.style.background = "";
+                    log("L.O.L.A.: Just kidding. Recovery complete. Don't do that again, Cadet.", "lola");
+                    updateUI();
+                }, 4200);
+            }
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'sudo !!') {
+            log("Sorry, no bash history enabled in this simulation. Try again later.", "highlight");
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'clear' || lower === 'cls') {
+            clearTerminal();
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'whoami') {
+            log(`You are Cadet ${state.cadetName}. Still not root.`, "highlight");
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'hostname') {
+            log("Station-Delta-OS v2.9.3", "highlight");
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'date') {
+            log(new Date().toUTCString() + " — Station Delta Time", "highlight");
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'neofetch' || lower === 'screenfetch') {
+            log(`\n     ██████╗ ██╗   ██╗██╗██╗     ██████╗ \n    ██╔═══██╗██║   ██║██║██║     ██╔══██╗\n    ██║   ██║██║   ██║██║██║     ██████╔╝\n    ██║   ██║╚██╗ ██╔╝██║██║     ██╔══██╗\n    ╚██████╔╝ ╚████╔╝ ██║███████╗██║  ██║\n     ╚═════╝   ╚═══╝  ╚═╝╚══════╝╚═╝  ╚═╝\n\nVIBE_OS ELITE v2.9.3\nUptime: ${Math.floor(Math.random()*24)}h ${Math.floor(Math.random()*60)}m\nShell: vibe-sh\nRogue agents: ${rogueActive ? 1 : 0}\nCPU: L.O.L.A. @ 1337% (overclocked)\n`, "highlight");
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'sudo make me a sandwich') {
+            log(asciiArt.sandwich, "success");
+            log("Okay... but only because you said please.", "highlight");
+            checkObjective(val);
+            return;
+        }
+
+        if (lower === 'git status') {
+            log("On branch main\nYour branch is up to date with 'origin/main'.\nWorking tree clean... except for that one rogue agent.", "highlight");
+            checkObjective(val);
+            return;
+        }
+
+        // === NORMAL COMMAND HANDLING ===
         if (lower === 'help' && !state.hardMode) {
             const currentObj = phases[state.phase].objectives[state.lesson];
             log(`=== GUIDANCE ===`, 'highlight');
             log(`GOAL: ${currentObj.desc}`, 'success');
             log(`TIP: ${currentObj.explanation}`);
+            checkObjective(val);
             return;
         }
 
