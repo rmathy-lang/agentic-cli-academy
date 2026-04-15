@@ -71,7 +71,7 @@
 <div id="academy-bar">
     <span style="font-weight:bold; color:var(--accent-color)">VIBE ACADEMY</span>
     <div id="progress-container"><div id="progress-fill"></div></div>
-    <span id="phase-label">PHASE 1/13</span>
+    <span id="phase-label">PHASE 1/12</span>
 </div>
 
 <div id="game-layout">
@@ -144,60 +144,39 @@
     };
 
     const phases = [null,
-        { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your map. It tells you exactly which folder you are currently standing in." }] },
+        { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your map." }] },
         { 
             title: "Privilege Escalation", 
-            lola: "The system is locked down. First, use **'ls'** to find the restricted access key.", 
+            lola: "The system is locked down. Use **'ls'** to find the restricted access key.", 
             objectives: [
-                { cmd: ["ls"], desc: "Type 'ls'", response: "I see it: 'restrict_access.key'.", explanation: "Before you can open a lock, you have to find the door." },
-                { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "Notice how a normal 'cat' would fail here? 'sudo' (SuperUser Do) is what gives you the admin power to bypass that 'Permission Denied' error." }
+                { cmd: ["ls"], desc: "Type 'ls'", response: "I see it: 'restrict_access.key'.", explanation: "Find the lock before the key." },
+                { cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'sudo' provides admin power to bypass permissions." }
             ] 
         },
-        { title: "Navigation", lola: "Good. Now we need to find the AI files. Use **'cd'** (Change Directory) to move into the projects folder. Type: **'cd projects'**", objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to projects.", explanation: "'cd' is how you walk through the doors of different folders in a computer's memory." }] },
-        { title: "Agent Status", lola: "Let's check our AI agents. Use the custom command **'vibe status'** to see if they are awake.", objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "In this system, 'vibe' is our control tool for AI agents. Checking status ensures no one is 'frozen'." }] },
-        { title: "MCP Init", lola: "We need a bridge between our logic and our tools. Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a real-world standard that lets AI agents use local tools safely." }] },
-        { title: "Tool Authorization", lola: "AI Agents shouldn't have power without permission. Use **'vibe auth'** to give the 'Engineer' agent access to the 'npm' tool. Type: **'vibe auth --agent Engineer --tool npm'**", objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "Type the full auth command", response: "Authorized.", explanation: "Explicit authorization prevents AI from making accidental changes." }] },
+        { title: "Navigation", lola: "Excellent. Use **'cd'** (Change Directory) to move into the projects folder. Type: **'cd projects'**", objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to projects.", explanation: "'cd' is how you navigate folder structures." }] },
+        { title: "Agent Status", lola: "Let's check our AI agents. Use the custom command **'vibe status'** to see if they are awake.", objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "Checking status ensures orchestration is stable." }] },
+        { title: "MCP Init", lola: "Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a protocol that lets agents use local tools safely." }] },
+        { title: "Tool Authorization", lola: "Authorize the 'Engineer' agent to use 'npm'. Type: **'vibe auth --agent Engineer --tool npm'**", objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "Type the auth command", response: "Authorized.", explanation: "Authorization ensures AI doesn't act without permission." }] },
         { 
-    title: "Data Stream Orchestration", 
-    lola: "The logs are a flood of noise, Cadet. To find the signal, we use the **'|' (Pipe)**. It takes the output of one command and feeds it directly into the next as input.", 
-    objectives: [
-        { 
-            cmd: ["cat logs.txt"], 
-            desc: "Type 'cat logs.txt'", 
-            response: "See that wall of text? That's 'Standard Output'. It's useless to a human in that volume.", 
-            explanation: "Raw data is like unrefined oil—it needs a pipeline to become useful." 
+            title: "Data Stream Orchestration", 
+            lola: "The logs are noise. Use the **'|' (Pipe)** to filter them. Type: **'cat logs.txt | grep CRITICAL'**", 
+            objectives: [
+                { cmd: ["cat logs.txt"], desc: "Type 'cat logs.txt'", response: "Too much noise.", explanation: "Raw data needs a pipeline to become useful." },
+                { cmd: ["cat logs.txt | grep CRITICAL"], desc: "Use the pipe '|' symbol", response: "Power failing!", explanation: "The pipe 'glues' output from one command to the input of another." }
+            ] 
         },
         { 
-            cmd: ["cat logs.txt | grep CRITICAL"], 
-            desc: "Use the pipe '|' symbol", 
-            response: "Power failing! You just built your first data pipeline.", 
-            explanation: "The Pipe ('|') is the 'glue' of the system. By piping 'cat' into 'grep', you filtered thousands of lines of noise into two lines of actionable intelligence." 
-        }
-    ] 
-},
-       { 
-    title: "Contextual Grounding", 
-    lola: "Great, we have the 'CRITICAL' errors. But an AI agent is only as smart as the context you give it. We need to **ground** the agent by piping those specific errors into the reasoning engine.", 
-    objectives: [
-        { 
-            cmd: ["cat logs.txt | grep CRITICAL | vibe explain"], 
-            desc: "Pipe filtered logs to 'vibe explain'", 
-            response: "Analysis complete: The AI identifies a hardware conflict in Sector 7.", 
-            explanation: "This is 'Grounding.' By filtering the data *before* it hits the AI, you prevent 'Hallucination' and save on processing costs (tokens)." 
+            title: "Contextual Grounding", 
+            lola: "Ground the agent by piping filtered errors into the reasoning engine.", 
+            objectives: [
+                { cmd: ["cat logs.txt | grep CRITICAL | vibe explain"], desc: "Pipe logs to vibe explain", response: "Analysis: Hardware conflict at PID 1337.", explanation: "Grounding provides the AI with 'truth' to prevent hallucination." },
+                { cmd: ["vibe explain --json"], desc: "Use the --json flag", response: '{"issue": "Sector 7", "target": "1337"}', explanation: "JSON is the universal language of agent-to-machine communication." }
+            ] 
         },
-        { 
-            cmd: ["vibe explain --json"], 
-            desc: "Format the explanation as JSON", 
-            response: '{"issue": "Sector 7 Conflict", "severity": "High"}', 
-            explanation: "JSON (JavaScript Object Notation) is how AI agents talk to other machines. It turns a conversational 'vibe' into a predictable data structure." 
-        }
-    ] 
-}
-        { title: "Structured Info", lola: "AI agents communicate best with clean data. Add the **'--json'** flag to get a computer-readable explanation. Type: **'vibe explain --json'**", objectives: [{ cmd: ["vibe explain --json"], desc: "Add the --json flag", response: '{"target": "1337"}', explanation: "JSON is the universal language of the internet." }] },
-        { title: "Prompt Governance", lola: "Our AI is hallucinating. We need to edit the **System Prompt**. Type: **'vibe prompt --edit'**", objectives: [{ cmd: ["vibe prompt --edit"], desc: "Type 'vibe prompt --edit'", response: "Fixed.", explanation: "A System Prompt is the personality and rules you give an AI to keep it on track." }] },
-        { title: "Detection", lola: "A rogue agent is running. Use **'ps'** (Process Status) to see all active computer tasks.", objectives: [{ cmd: ["ps"], desc: "Type 'ps'", response: "Found.", explanation: "'ps' shows you everything currently alive in the computer." }] },
-        { title: "Containment", lola: "Found it! The rogue process is number 1337. Use the **'kill'** command to stop it. Type: **'kill 1337'**", objectives: [{ cmd: ["kill 1337"], desc: "Type 'kill 1337'", response: "Neutralized.", explanation: "'kill' sends a signal to a process to stop immediately." }] },
-        { title: "Final Build", lola: "System stable. Time to launch. Execute the final build: **'vibe build'**", objectives: [{ cmd: ["vibe build"], desc: "Type 'vibe build'", response: "Launch!", explanation: "Mission Success. You've orchestrated a full AI system from the command line." }] }
+        { title: "Prompt Governance", lola: "The AI's personality is erratic. We need to edit the **System Prompt**. Type: **'vibe prompt --edit'**", objectives: [{ cmd: ["vibe prompt --edit"], desc: "Type 'vibe prompt --edit'", response: "Fixed.", explanation: "A System Prompt sets the fundamental rules and 'personality' of an AI agent." }] },
+        { title: "Detection", lola: "A rogue agent is running. Use **'ps'** (Process Status) to see all active computer tasks.", objectives: [{ cmd: ["ps"], desc: "Type 'ps'", response: "Found it.", explanation: "'ps' reveals every process currently running in the OS kernel." }] },
+        { title: "Containment", lola: "The rogue is 1337. Use the **'kill'** command to stop it. Type: **'kill 1337'**", objectives: [{ cmd: ["kill 1337"], desc: "Type 'kill 1337'", response: "Neutralized.", explanation: "'kill' stops a process execution immediately." }] },
+        { title: "Final Build", lola: "System stable. Execute the final build: **'vibe build'**", objectives: [{ cmd: ["vibe build"], desc: "Type 'vibe build'", response: "Launch!", explanation: "Mission Success. Orchestration complete." }] }
     ];
 
     function saveGame() { localStorage.setItem('vibe_academy_save', JSON.stringify(state)); }
@@ -223,8 +202,8 @@
     }
 
     function updateUI() {
-        document.getElementById('phase-label').textContent = `PHASE ${state.phase}/13`;
-        document.getElementById('progress-fill').style.width = `${(state.phase / 13) * 100}%`;
+        document.getElementById('phase-label').textContent = `PHASE ${state.phase}/12`;
+        document.getElementById('progress-fill').style.width = `${(state.phase / 12) * 100}%`;
     }
 
     function handleCommand(raw) {
@@ -234,52 +213,37 @@
         log(`❯ ${val}`);
         const lower = val.toLowerCase();
 
-        // Easter eggs
-        if (lower.includes('rm -rf /') || lower.includes('rm -fr /')) {
-            if (!lower.includes('sudo')) log("Permission denied. (Nice try)", "error");
+        if (lower.includes('rm -rf /')) {
+            if (!lower.includes('sudo')) log("Permission denied.", "error");
             else {
                 log("CRITICAL: ROOT DELETION INITIALIZED", "error");
                 setTimeout(() => { document.getElementById('output').innerHTML = ""; document.body.style.background = "#000"; log("FATAL ERROR: OS NOT FOUND", "matrix"); }, 1500);
-                setTimeout(() => { document.body.style.background = ""; log("L.O.L.A.: Recovery complete. Please don't do that again, Cadet.", "lola"); updateUI(); }, 4000);
+                setTimeout(() => { document.body.style.background = ""; log("L.O.L.A.: Recovery complete.", "lola"); updateUI(); }, 4000);
             }
             return;
         }
-        if (lower === 'vibe delete world') {
-            log("INITIATING WORLD_END.SH...", "error");
-            document.body.style.filter = "brightness(0)";
-            setTimeout(() => { document.body.style.filter = ""; log("L.O.L.A.: Request intercepted.", "lola"); }, 2000);
-            return;
-        }
 
-        // Help command
         if (lower === 'help' && !state.hardMode) {
             const currentObj = phases[state.phase].objectives[state.lesson];
             log(`=== EMERGENCY ASSISTANCE ===`, 'highlight');
-            log(`CURRENT PHASE: ${state.phase} - ${phases[state.phase].title}`);
             log(`GOAL: ${currentObj.desc}`, 'success');
             log(`HINT: ${currentObj.explanation}`);
             return;
         }
 
-        // Core commands (all now fully functional)
         if (lower.startsWith('man ')) {
             const cmd = lower.split(' ')[1];
             if (helpDB[cmd]) {
                 log(`=== ${cmd.toUpperCase()} MANUAL ===`, 'highlight');
                 log(helpDB[cmd].desc);
                 log(`Why: ${helpDB[cmd].why}`);
-            } else log("Type 'man <cmd>' for: ls, pwd, cd, cat, sudo, grep, tail, ps, kill, vibe", 'highlight');
-        }
-        else if (lower === 'tail -f' || lower === 'tail -f logs.txt') {
-            tailFollowing = true;
-            document.getElementById('tail-status').innerHTML = '● FOLLOWING';
-            log("Telemetry follow enabled.", 'success');
+            } else log("Commands: ls, pwd, cd, cat, sudo, grep, tail, ps, kill, vibe", 'highlight');
         }
         else if (lower === 'ls') log(vfs[currentPath].children.join('  '));
         else if (lower === 'pwd') log(currentPath);
         else if (lower === 'ps') {
             log("PID 1 | vibe_kernel");
-            if (state.phase >= 11 && rogueActive) log(asciiArt.ghost, 'error');
+            if (state.phase >= 10 && rogueActive) log(asciiArt.ghost, 'error');
         }
         else if (lower.startsWith('cd ')) {
             const dir = lower.split(' ')[1];
@@ -287,21 +251,19 @@
             else if (vfs[currentPath + '/' + dir]) currentPath += '/' + dir;
             else log(`cd: ${dir}: Not found`, 'error');
         }
-        else if (lower === 'cat restrict_access.key' && !lower.includes('sudo')) log("Permission denied", 'error');
         else if (lower.includes('sudo cat restrict_access.key')) log("Key: XJ-99", 'success');
-        else if (lower.includes('cat logs.txt')) log(vfs['/home/logs.txt'].content);
         else if (lower.includes('cat logs.txt | grep critical')) log("CRITICAL: Power failing\nCRITICAL: Escape Pod locked");
-        else if (lower.includes('cat logs.txt | vibe explain')) log("LLM: System failing due to rogue-ai PID 1337.", 'lola');
-        else if (lower.includes('vibe explain --json')) log('{"status": "failure", "target": "1337"}', 'lola');
-        else if (lower.includes('vibe auth --agent engineer --tool npm')) log("Tool authorized.", 'success');
-        else if (lower === 'vibe mcp init') log("MCP Server Online.", 'success');
-        else if (lower.includes('vibe prompt --edit')) log("System prompt updated.", 'success');
+        else if (lower.includes('cat logs.txt | vibe explain')) log("LLM Analysis: Conflict at PID 1337.", 'lola');
+        else if (lower.includes('vibe explain --json')) log('{"issue": "Sector 7", "target": "1337"}', 'lola');
+        else if (lower.includes('vibe auth')) log("Authorized.", 'success');
+        else if (lower === 'vibe mcp init') log("MCP Online.", 'success');
+        else if (lower.includes('vibe prompt --edit')) log("Prompt updated.", 'success');
         else if (lower.startsWith('kill 1337')) {
-            if (state.phase >= 12) { log("Agent destroyed.", "success"); rogueActive = false; }
-            else log("Permission denied: Root bypass required.", "error");
+            if (state.phase >= 11) { log("Terminated.", "success"); rogueActive = false; }
+            else log("Permission denied.", "error");
         }
-        else if (lower === 'vibe status') log("ENGINEER: Context 420 | CAPTAIN: Idle");
-        else if (lower.includes('vibe build') && state.phase === 13) streamBuild();
+        else if (lower === 'vibe status') log("ENGINEER: Ready | CAPTAIN: Idle");
+        else if (lower.includes('vibe build') && state.phase === 12) streamBuild();
 
         checkObjective(val);
         updateUI();
@@ -330,10 +292,10 @@
     }
 
     function nextPhase() {
-        if (state.phase >= 13) { finishGame(); return; }
+        if (state.phase >= 12) { finishGame(); return; }
         state.phase++;
         state.lesson = 0;
-        if (state.phase === 11) rogueActive = true;
+        if (state.phase === 10) rogueActive = true;
         log(`--- PHASE ${state.phase}: ${phases[state.phase].title} ---`, 'success');
         log(phases[state.phase].lola, 'lola');
         saveGame();
@@ -341,7 +303,7 @@
     }
 
     function streamBuild() {
-        const lines = ["Initializing build...", "Orchestrating agents...", "Deploying MCP...", "Ignition!"];
+        const lines = ["Initializing build...", "Orchestrating agents...", "Ignition!"];
         let i = 0;
         const target = document.getElementById('code-content');
         target.innerHTML = "";
@@ -360,52 +322,34 @@
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
         document.getElementById('command-input').focus();
-        
-        log("Hello Cadet, I'm L.O.L.A. — your Logistics & Orchestration Liaison Assistant.", 'lola');
-        if (!state.hardMode) log("If you ever get stuck, just type **'help'** for guidance.", 'highlight');
+        log("L.O.L.A. Initialized.", 'lola');
         log(phases[state.phase].lola, 'lola');
         updateUI();
     }
 
     function finishGame() {
-        document.getElementById('final-score').innerText = `Proficiency Rating: ${100 - state.totalHints}%`;
+        document.getElementById('final-score').innerText = `Rating: ${100 - state.totalHints}%`;
         document.getElementById('grad-modal').style.display = 'flex';
     }
 
     function exportManifest() {
-        const reportCard = {
-            candidate: state.cadetName,
-            certification: "Elite Agentic AI & CLI Orchestrator",
-            score: `${100 - state.totalHints}%`,
-            timestamp: new Date().toISOString()
-        };
-        const blob = new Blob([JSON.stringify(reportCard, null, 2)], {type: 'application/json'});
+        const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `Vibe_Manifest_${state.cadetName}.json`;
+        a.download = `Vibe_Manifest.json`;
         a.click();
     }
 
     document.getElementById('command-input').addEventListener('keydown', (e) => {
-        const input = e.target;
         if (e.key === 'Enter') {
-            handleCommand(input.value);
-            input.value = '';
+            handleCommand(e.target.value);
+            e.target.value = '';
         }
     });
-
-    setInterval(() => {
-        if (tailFollowing) {
-            const messages = ["AGENTS: Synchronizing...", "MCP: Port 8080 Active", "INFO: Kernel Stable"];
-            sysLog(messages[Math.floor(Math.random() * messages.length)]);
-        }
-    }, 1800);
 
     if (state.phase > 1) {
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
-        log("L.O.L.A.: Welcome back, Cadet. System state restored.", 'lola');
-        log(phases[state.phase].lola, 'lola');
         updateUI();
     }
 </script>
