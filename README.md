@@ -1,45 +1,65 @@
-# 🚀 Vibe Cadet: Terminal Trials
+🚀 **Vibe Cadet Academy: Elite Edition**
 
-**Vibe Cadet: Terminal Trials** is a satirical, sci-fi terminal simulator designed to transform beginners into "Vibe Coders." Inspired by classic text adventures like *The Hitchhiker’s Guide to the Galaxy*, this game teaches essential Command Line Interface (CLI) skills through a simulated mission aboard the *SS StackOverflow*.
+Vibe Cadet Academy: Elite Edition is a premium, single-file terminal simulator that turns complete beginners into confident "Vibe Coders" in under 20 minutes.
 
-Guided by **L.O.L.A.** (Logical Oversight & Linguistic Assistant), you will progress from a "Digital Janitor" to a "Deployment God," mastering the tools required for modern software development in 2026.
+Styled like a high-end 2026 cyberpunk mission control with CRT scanlines, syntax-highlighted code streaming, and real tab completion, this game teaches modern CLI + AI orchestration skills through an immersive sci-fi story aboard the **SS StackOverflow**.
 
-## 🎮 [Play Vibe Cadet: Terminal Trials Now!](index.html)
+Guided by **L.O.L.A.** (Logical Oversight & Linguistic Assistant), you’ll progress from a lost cadet to an **Elite Vibe Cadet** — mastering terminals, Git, package managers, AI agents, and prompt-driven development.
+
+### 🎮 Play Vibe Cadet Academy: Elite Edition
+Just open the HTML file in any browser — no install, no server, no setup.
+
+### 🛠 What You Will Learn (8 Progressive Phases)
+
+**Phase 1: Navigation**  
+Master directory movement (`ls` / `eza`, `cd`) with a real virtual filesystem.
+
+**Phase 2: Project Init**  
+Create structure and initialize version control (`cd`, `git init`).
+
+**Phase 3: Package Management**  
+Handle modern dependencies (`bun install`).
+
+**Phase 4: Agent Orchestration**  
+Create your first AI crew member (`vibe create --role manager --name Captain`).
+
+**Phase 5: Team Building**  
+Expand your crew with specialists (`vibe create --role specialist --name Engineer`).
+
+**Phase 6: Prompt Intelligence**  
+Learn to communicate effectively with agents (`prompt agent Captain`).
+
+**Phase 7–8: Final Mission**  
+Trigger real AI-powered builds and watch syntax-highlighted code stream live in the IDE pane (`vibe build`).
+
+### ✨ Elite Features
+- **Real interactive terminal** with working `ls`, `cd`, `touch`, and full tab completion (type `cd pro` + **Tab** → auto-completes)
+- **Live code streaming** with beautiful syntax highlighting in the side IDE pane
+- **Progress saving** — close the tab and come back later; your phase is remembered
+- **Achievements system** with unlock messages
+- **Sandbox mode** after graduation (free-play terminal)
+- **Graduation ceremony** + shareable certificate on X
+- Beautiful CRT aesthetic with glitch effects and immersive sound-like feedback
+
+### 🕹 How to Play
+1. Open the HTML file in your browser.
+2. Follow L.O.L.A.’s instructions in the terminal.
+3. Type commands exactly as prompted (or use tab completion).
+4. Watch your AI crew come alive and the code stream in real time.
+5. Complete all 8 phases to graduate as an Elite Vibe Cadet.
+
+**Pro tip:** Stuck? The game gives smart hints. Type commands naturally — it’s very forgiving.
+
+### 🚀 Deployment / Sharing
+This is a **single self-contained HTML file**. To host it:
+
+1. Upload `vibe-cadet-academy-elite.html` to a GitHub repo.
+2. Enable GitHub Pages (or any static host like Vercel, Netlify, Cloudflare Pages).
+3. Share the link — perfect for Discord, X, or your personal site.
 
 ---
 
-## 🛠 What You Will Learn
+**Created for the next generation of vibe coders.**  
+Don’t let the ship crash. Train here first.
 
-The curriculum follows a logical progression of skills:
-
-1.  **Phase 1: The Digital Janitor (Navigation)**
-    * Navigating directories (`cd`, `zoxide`)
-    * Listing files with style (`eza`, `ls`)
-    * Managing files and folders (`mkdir`, `touch`, `cat`)
-2.  **Phase 2: The Save-Game Architect (Version Control)**
-    * Initializing repositories (`git init`)
-    * Staging and saving progress (`git add`, `git commit`)
-    * Branching and GitHub integration (`gh`)
-3.  **Phase 3: The Package Pilot (Ecosystems)**
-    * Managing dependencies with modern tools (`bun`, `pnpm`, `uv`)
-    * Running development environments (`npm run dev`)
-4.  **Phase 4 & 5: AI Orchestration & Deployment** (Conceptualized)
-    * Piping data to AI agents
-    * Deploying to the cloud (`vercel`, `netlify`)
-
-## 🕹 How to Play
-
-1.  **Open the Terminal:** Use the link above to launch the game in your browser.
-2.  **Follow L.O.L.A.'s Instructions:** Read the messages from your AI assistant. She will give you specific objectives.
-3.  **Type Commands:** Use the input field at the bottom to type your commands just like a real terminal.
-4.  **Get Help:** If you're stuck, type `help` to see your current objectives and available commands.
-
-## 🚀 Deployment
-
-This game is a single-file application. To host it yourself:
-1.  Upload `index.html` to a GitHub repository.
-2.  Enable **GitHub Pages** in the repository settings.
-3.  Share your URL with the world!
-
----
-*Created for the next generation of vibe coders. Don't let the ship crash.*
+Made with ❤️ for the vibe coding community • 2026
