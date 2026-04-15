@@ -377,9 +377,16 @@
     }, 1800);
 
     if (state.phase > 1) {
+        // Hide the intro screen and show the game
         document.getElementById('briefing-screen').style.display = 'none';
         document.getElementById('game-layout').style.visibility = 'visible';
+        
+        // Give the returning player a warm welcome
+        log("L.O.L.A.: Welcome back, Cadet. System state restored.", 'lola');
         log(phases[state.phase].lola, 'lola');
+        
+        // Auto-focus the input so they can start typing immediately
+        document.getElementById('command-input').focus();
         updateUI();
     }
 </script>
