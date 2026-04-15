@@ -222,6 +222,15 @@
         }
 
         // === CORE COMMANDS ===
+        if (lower === 'help') {
+            const currentObj = phases[state.phase].objectives[state.lesson];
+            log(`=== EMERGENCY ASSISTANCE ===`, 'highlight');
+            log(`CURRENT PHASE: ${state.phase} - ${phases[state.phase].title}`);
+            log(`GOAL: ${currentObj.desc}`, 'success');
+            log(`HINT: ${currentObj.explanation}`);
+            log(`COMMANDS: ls, pwd, cd, cat, man, vibe, sudo`, 'highlight');
+            return;
+        }
         if (lower.startsWith('man ')) {
             const cmd = lower.split(' ')[1];
             if (helpDB[cmd]) {
