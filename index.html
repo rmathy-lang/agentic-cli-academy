@@ -97,113 +97,63 @@
 </div>
 
 <script>
+    // ==================== STATE & VFS ====================
     let cadetName = "Cadet";
     let currentPath = '/home';
     let phase = 1, lesson = 0;
-    let failCount = 0;
     let commandHistory = [];
     let historyIndex = -1;
 
     const vfs = {
-        '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt'] },
-        '/home/README.txt': { type: 'file', content: 'Welcome to Vibe-Station Delta. Master the CLI to survive.' },
-        '/home/manual.txt': { type: 'file', content: 'Pro tip: Type "man <command>" for real explanations.' },
+        '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt', 'logs.txt', 'restrict_access.key'] },
+        '/home/README.txt': { type: 'file', content: 'STATION DELTA: Emergency Protocol Active.' },
+        '/home/manual.txt': { type: 'file', content: 'Pro tip: Type "man <command>" for technical specs.' },
+        '/home/logs.txt': { type: 'file', content: 'ERROR 404: Oxygen low\nCRITICAL: Power failing\nINFO: AI sleeping\nCRITICAL: Escape Pod locked' },
+        '/home/restrict_access.key': { type: 'file', content: 'XJ-99-PROMPT-BYPASS', locked: true },
         '/home/projects': { type: 'dir', children: ['game_v1'] },
         '/home/projects/game_v1': { type: 'dir', children: ['main.js'] },
         '/home/projects/game_v1/main.js': { type: 'file', content: 'console.log("Escape Pod ready!");' }
     };
 
-    const helpDB = {
-        'ls': { desc: 'List directory contents', why: 'Shows you what files and folders are here — the most-used command in the terminal.' },
-        'cd': { desc: 'Change directory', why: 'Moves you between folders. Without it you’re stuck in one place.' },
-        'pwd': { desc: 'Print working directory', why: 'Tells you exactly where you are in the filesystem.' },
-        'cat': { desc: 'Concatenate / view file', why: 'Reads the content of a file — like opening a document without a GUI.' },
-        'mkdir': { desc: 'Make directory', why: 'Creates new folders to organize your work.' },
-        'touch': { desc: 'Create empty file', why: 'Quick way to create new files.' },
-        'git': { desc: 'Version control', why: 'Tracks changes so you can undo mistakes and work with teams safely.' }
-    };
-
+    // ==================== 10-PHASE CURRICULUM ====================
     const phases = [
         null,
-        { title: "Orientation", lola: "Systems are cold. Let's learn to see where we are.", objectives: [
-            { cmd: ["ls"], desc: "Type ls to list files", response: "Directory contents listed.", explanation: "ls shows you everything in the current folder. Real developers use this constantly." },
-            { cmd: ["pwd"], desc: "Type pwd to see current location", response: "Current path displayed.", explanation: "pwd = Print Working Directory. It answers 'where am I?'" },
-            { cmd: ["cat README.txt"], desc: "Type cat README.txt", response: "File read.", explanation: "cat lets you read files directly in the terminal." }
+        { title: "Standard Errors", lola: "The terminal is cold. It won't help you unless you're exact.", objectives: [
+            { cmd: ["pwd"], desc: "Run 'pwd' to locate yourself", response: "Path confirmed.", explanation: "Real systems use absolute paths. You are currently in /home." },
+            { cmd: ["ls"], desc: "List files", response: "Listing files...", explanation: "ls is the pulse of the CLI." }
         ]},
-        { title: "Navigation", lola: "Time to move around the station.", objectives: [
-            { cmd: ["cd projects"], desc: "cd into projects", response: "Navigated to projects.", explanation: "cd changes your current directory." },
-            { cmd: ["cd game_v1"], desc: "cd into game_v1", response: "Now inside the workspace.", explanation: "You can chain navigation commands to go deep into projects." }
+        { title: "Privilege (Sudo)", lola: "Some files are locked by the system. You need Root access.", objectives: [
+            { cmd: ["cat restrict_access.key"], desc: "Try to 'cat restrict_access.key'", response: "Permission denied.", explanation: "Wait—did you see that? You don't have permission. You need to use 'sudo'." },
+            { cmd: ["sudo cat restrict_access.key"], desc: "Now use 'sudo cat restrict_access.key'", response: "Access Granted. Key: XJ-99", explanation: "sudo = 'SuperUser Do'. It gives you temporary admin powers. Use it carefully." }
         ]},
-        { title: "Creation", lola: "Let's build something.", objectives: [
-            { cmd: ["mkdir backup"], desc: "mkdir backup", response: "Backup folder created.", explanation: "mkdir creates new directories. Organization is key." },
-            { cmd: ["touch log.txt"], desc: "touch log.txt", response: "File created.", explanation: "touch quickly creates empty files." }
+        { title: "Piping & Filtering", lola: "There's a lot of noise in the logs. We need to find the CRITICAL errors.", objectives: [
+            { cmd: ["cat logs.txt | grep CRITICAL"], desc: "Run 'cat logs.txt | grep CRITICAL'", response: "Filtering logs...", explanation: "The '|' (pipe) sends output from one tool to another. 'grep' searches for text. This is how pros handle big data." }
         ]},
-        { title: "Source Control", lola: "We need memory. Initialize git.", objectives: [
-            { cmd: ["git init"], desc: "git init", response: "Repository initialized.", explanation: "git init creates a hidden folder that remembers every change." }
+        { title: "Navigation", lola: "Enter the workspace.", objectives: [
+            { cmd: ["cd projects"], desc: "cd into projects", response: "Moving...", explanation: "Navigation is 50% of the job." },
+            { cmd: ["cd game_v1"], desc: "cd into game_v1", response: "Inside workspace.", explanation: "You are now at the station core." }
         ]},
-        { title: "Dependency Sync", lola: "Sync the core libraries.", objectives: [
-            { cmd: ["bun install"], desc: "bun install", response: "Packages synced.", explanation: "Package managers like Bun install libraries your project needs." }
+        { title: "The Build Failure", lola: "Initiate the build. (Be ready for trouble).", objectives: [
+            { cmd: ["vibe build"], desc: "Run 'vibe build'", response: "BUILD FAILED: Missing dependency 'git'.", explanation: "In the real world, things break. You must fix the environment before the code can run." }
         ]},
-        { title: "Engineering", lola: "Create the Engineer specialist.", objectives: [
-            { cmd: ["vibe create"], desc: "vibe create --role specialist --name Engineer", response: "Engineer is now ACTIVE.", explanation: "Automation agents help you scale your work." }
+        { title: "Fixing the Env", lola: "Initialize git to fix the build error.", objectives: [
+            { cmd: ["git init"], desc: "Run 'git init'", response: "Git initialized.", explanation: "Source control is often a requirement for modern build pipelines." }
         ]},
-        { title: "Command", lola: "Create the Captain.", objectives: [
-            { cmd: ["vibe create"], desc: "vibe create --role manager --name Captain", response: "Captain is now ACTIVE.", explanation: "Managers coordinate multiple agents." }
+        { title: "Team Assembly", lola: "Hire the Engineer.", objectives: [
+            { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create Engineer", response: "Engineer Online.", explanation: "Orchestrating agents requires precise flag syntax." }
         ]},
-        { title: "Launch", lola: "Final build sequence.", objectives: [
-            { cmd: ["vibe build"], desc: "vibe build", response: "Build initiated...", explanation: "The build process packages your code for the real world." }
+        { title: "Final Auth", lola: "Hire the Captain.", objectives: [
+            { cmd: ["vibe create --role manager --name Captain"], desc: "Create Captain", response: "Captain Online.", explanation: "Management layers are now active." }
+        ]},
+        { title: "Override", lola: "L.O.L.A. is offline. No more hints. Talk to the Captain to finish.", objectives: [
+            { cmd: ["prompt agent Captain"], desc: "??? (Use your knowledge)", response: "Captain: Build sequence standing by.", explanation: "You are acting on your own now. Well done." }
+        ]},
+        { title: "Ignition", lola: "Launch.", objectives: [
+            { cmd: ["vibe build"], desc: "Final Build", response: "Ignition!", explanation: "Mission Accomplished." }
         ]}
     ];
 
-    function highlight(code) {
-        return code.replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
-            .replace(/\b(import|const|new|export|from|await|async|function|return|let|class)\b/g, '<span class="kw">$1</span>')
-            .replace(/(['"`])(.*?)\1/g, '<span class="str">$1$2$1</span>')
-            .replace(/\b(\w+)(?=\()/g, '<span class="fn">$1</span>');
-    }
-
-    function log(text, type = '') {
-        const entry = document.createElement('div');
-        entry.className = type;
-        if (type === 'lola') entry.innerHTML = `<span class="lola">L.O.L.A.: </span>${text}`;
-        else if (type === 'success') entry.innerHTML = `<span class="success">${text}</span>`;
-        else if (type === 'highlight') entry.innerHTML = `<span class="highlight">MISSION: </span>${text}`;
-        else if (type === 'debrief') entry.innerHTML = `<div class="debrief">${text}</div>`;
-        else entry.textContent = text;
-        document.getElementById('output').insertBefore(entry, document.getElementById('output').firstChild);
-    }
-
-    function sysLog(text) {
-        const entry = document.createElement('div');
-        entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
-        document.getElementById('log-stream').appendChild(entry);
-        document.getElementById('log-stream').scrollTop = 9999;
-    }
-
-    function updateUI() {
-        document.getElementById('path-display').textContent = currentPath;
-        document.getElementById('phase-label').textContent = `PHASE ${phase}/8`;
-        document.getElementById('progress-fill').style.width = `${((phase - 1) / 7) * 100}%`;
-        const obj = phases[phase]?.objectives[lesson];
-        document.getElementById('command-input').placeholder = obj ? `Next: ${obj.desc}` : "Type man <command> for help...";
-    }
-
-    function streamCode() {
-        const snippet = ["import { EscapePod } from 'vibe-os';", "const pod = new EscapePod();", "pod.prepareLaunch();", "pod.on('ready', () => {", "  pod.launch();", "});"];
-        let i = 0;
-        document.getElementById('code-content').innerHTML = highlight("// Final build sequence...\n");
-        const interval = setInterval(() => {
-            document.getElementById('code-content').innerHTML += highlight(snippet[i] + "\n");
-            sysLog(`AGENT: Writing module ${i+1}...`);
-            i++;
-            if (i >= snippet.length) {
-                clearInterval(interval);
-                log("MISSION ACCOMPLISHED. Escape Pod launched.", "success");
-                setTimeout(nextPhase, 1500);
-            }
-        }, 280);
-    }
-
+    // ==================== ENGINE LOGIC ====================
     function handleCommand(raw) {
         if (!raw.trim()) return;
         const val = raw.trim();
@@ -211,139 +161,88 @@
         historyIndex = -1;
 
         log(`❯ ${val}`);
-        const parts = val.split(' ');
-        const cmd = parts[0].toLowerCase();
+        const parts = val.toLowerCase().split(' ');
+        const cmd = parts[0];
 
-        // 1. EASTER EGG
-        if (val.replace(/\s/g, "") === "sudorm-rf/") {
-            document.body.classList.add('glitch');
-            log("CRITICAL ERROR: ROOT DELETED", "error");
-            setTimeout(() => location.reload(), 1500);
+        // --- UNIX ERROR SIMULATION ---
+        if (cmd === 'cat' && parts[1] === 'restrict_access.key' && !val.includes('sudo')) {
+            log("-vibe-os: cat: restrict_access.key: Permission denied", "error");
+            checkObjective(val); // Trigger the "failure" objective check
             return;
         }
 
-        // 2. HELP SYSTEM
-        if (cmd === 'man' || cmd === 'help') {
-            const target = parts[1] || 'general';
-            if (helpDB[target]) {
-                log(`=== ${target.toUpperCase()} MANUAL ===`, "highlight");
-                log(helpDB[target].desc);
-                log(`Why it matters: ${helpDB[target].why}`);
+        // --- STANDARD TOOLS ---
+        if (cmd === 'ls') {
+            log(vfs[currentPath].children.join('  '));
+        } else if (cmd === 'pwd') {
+            log(currentPath);
+        } else if (cmd === 'cd') {
+            let arg = parts[1];
+            let target = (!arg || arg === '..') ? '/home' : (arg.startsWith('/') ? arg : (currentPath === '/' ? '' : currentPath) + '/' + arg);
+            if (vfs[target]) { currentPath = target; updateUI(); }
+            else log(`-vibe-os: cd: ${arg}: No such file or directory`, "error");
+        } else if (cmd === 'cat' || val.includes('| grep')) {
+            handleComplexCmd(val);
+        } else if (cmd === 'man' || cmd === 'help') {
+            log("=== VIBE_OS MANUAL ===", "highlight");
+            log("ls, cd, pwd, cat, sudo, grep, git, vibe");
+            log(`OBJECTIVE: ${phases[phase].objectives[lesson].desc}`);
+        }
+
+        checkObjective(val);
+    }
+
+    function handleComplexCmd(val) {
+        if (val.includes('| grep')) {
+            const [c1, c2] = val.split('|').map(s => s.trim());
+            const search = c2.replace('grep ', '').trim();
+            const file = c1.replace('cat ', '').trim();
+            const fullPath = (currentPath === '/' ? '' : currentPath) + '/' + file;
+            
+            if (vfs[fullPath]) {
+                const results = vfs[fullPath].content.split('\n').filter(l => l.includes(search.toUpperCase()));
+                log(results.join('\n') || "No matches found.");
             } else {
-                log("=== VIBE_OS FIELD MANUAL ===", "highlight");
-                log("ls, cd, pwd, cat, mkdir, touch, git init/status");
-                log("Type 'man <command>' for detailed help.");
+                log(`cat: ${file}: No such file`, "error");
             }
-            return;
+        } else {
+            // Standard cat
+            const file = val.replace('cat ', '').replace('sudo ', '').trim();
+            const fullPath = (currentPath === '/' ? '' : currentPath) + '/' + file;
+            if (vfs[fullPath]) log(vfs[fullPath].content);
+            else log(`cat: ${file}: No such file`, "error");
         }
+    }
 
-        // 3. OBJECTIVE CHECK (Do this before standard command execution)
+    function checkObjective(val) {
         const obj = phases[phase]?.objectives[lesson];
-        let matched = false;
-        if (obj && obj.cmd.some(c => val.toLowerCase().includes(c.toLowerCase()))) {
-            matched = true;
-        }
+        if (!obj) return;
 
-        // 4. STANDARD TERMINAL EMULATION
-        if (cmd === 'ls') log(vfs[currentPath].children.join('  '));
-        else if (cmd === 'pwd') log(currentPath);
-        else if (cmd === 'cat' && parts[1]) {
-            const filePath = (currentPath === '/' ? '' : currentPath) + '/' + parts[1];
-            if (vfs[filePath]) log(vfs[filePath].content);
-            else log("File not found", "error");
-        }
-        else if (cmd === 'cd') {
-            let target = (!parts[1] || parts[1] === '..') ? '/home' : (parts[1].startsWith('/') ? parts[1] : (currentPath === '/' ? '' : currentPath) + '/' + parts[1]);
-            if (vfs[target]) { currentPath = target; log(`Moved to ${currentPath}`); updateUI(); }
-            else log(`No such directory: ${parts[1]}`, "error");
-        }
-        else if (cmd === 'vibe' && parts[1] === 'build' && phase === 8) {
-            streamCode();
-            return;
-        }
+        const matched = obj.cmd.some(c => val.toLowerCase().includes(c.toLowerCase()));
 
-        // 5. PROGRESSION LOGIC
         if (matched) {
-            failCount = 0;
             log(obj.response, 'lola');
-            log(obj.explanation, 'debrief'); // Use the debrief styling for the "Why"
+            log(obj.explanation, 'debrief');
             lesson++;
-
             if (lesson >= phases[phase].objectives.length) {
-                setTimeout(() => {
-                    log(`\n--- PHASE COMPLETE: ${phases[phase].title} ---`, 'success');
-                    setTimeout(nextPhase, 1000);
-                }, 500);
+                setTimeout(nextPhase, 1500);
             } else {
                 updateUI();
-            }
-        } else if (!['ls','cd','pwd','cat','man','help'].includes(cmd)) {
-            failCount++;
-            if (failCount >= 2) {
-                log(`HINT: Try 'man ${cmd}' or check the mission objective.`, 'highlight');
-                failCount = 0;
-            } else {
-                log("Command not recognized or out of sequence.", "error");
             }
         }
     }
 
     function nextPhase() {
-        phase++;
-        lesson = 0;
-        failCount = 0;
-        if (phase > 8) {
-            document.getElementById('grad-modal').style.display = 'flex';
-        } else {
-            log(`\nNEW MISSION: ${phases[phase].lola}`, 'lola');
+        phase++; lesson = 0;
+        if (phase > 10) document.getElementById('grad-modal').style.display = 'flex';
+        else {
+            log(`\n--- PHASE ${phase}: ${phases[phase].title} ---`, 'success');
+            log(phases[phase].lola, 'lola');
             updateUI();
         }
     }
-
-    function bootAcademy() {
-        cadetName = document.getElementById('callsign-input').value.trim() || "Cadet";
-        document.getElementById('user-display').textContent = cadetName.toLowerCase();
-        document.getElementById('briefing-screen').style.display = 'none';
-        document.getElementById('game-layout').style.visibility = 'visible';
-        log(phases[1].lola, 'lola');
-        updateUI();
-        sysLog("Mission Initialized. Connection Stable.");
-    }
-
-    function showAchievements() {
-        alert("🏆 Achievements:\n• Shell Cadet\n• Navigator\n• File Architect\n• Git Master");
-    }
-
-    document.getElementById('command-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            handleCommand(e.target.value);
-            e.target.value = '';
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (commandHistory.length > 0) {
-                historyIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
-                e.target.value = commandHistory[historyIndex];
-            }
-        } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-                historyIndex--;
-                e.target.value = commandHistory[historyIndex];
-            } else {
-                historyIndex = -1;
-                e.target.value = '';
-            }
-        } else if (e.key === 'Tab') {
-            e.preventDefault();
-            const val = e.target.value.trim().split(' ');
-            const last = val[val.length - 1];
-            const match = vfs[currentPath]?.children?.find(i => i.startsWith(last));
-            if (match) {
-                val[val.length - 1] = match;
-                e.target.value = val.join(' ');
-            }
-        }
-    });
+    
+    // (Keep your existing streamCode, updateUI, and EventListeners)
 </script>
 </body>
 </html>
