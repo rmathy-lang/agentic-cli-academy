@@ -6,190 +6,125 @@
     <title>Vibe Cadet Academy: Elite Edition</title>
     <style>
         :root { 
-            --bg-color: #0d1117; 
-            --text-color: #c9d1d9; 
-            --prompt-color: #58a6ff; 
-            --accent-color: #2ea043;
-            --error-color: #f85149; 
-            --highlight-color: #f0883e; 
-            --border: #30363d; 
-            --font-family: 'Fira Code', 'Courier New', monospace; 
+            --bg-color: #0d1117; --text-color: #c9d1d9; --prompt-color: #58a6ff; 
+            --accent-color: #2ea043; --error-color: #f85149; --highlight-color: #f0883e; 
+            --border: #30363d; --font-family: 'Fira Code', monospace; 
         }
         
         * { box-sizing: border-box; }
         body { 
-            background-color: #010409; 
-            color: var(--text-color); 
-            font-family: var(--font-family); 
-            margin:0; 
-            height:100vh; 
-            display:flex; 
-            flex-direction:column; 
-            overflow:hidden;
-            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), 
-                        linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); 
+            background-color: #010409; color: var(--text-color); font-family: var(--font-family); 
+            margin:0; height:100vh; display:flex; flex-direction:column; overflow:hidden;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%), 
+                        linear-gradient(90deg, rgba(255,0,0,0.03), rgba(0,255,0,0.01), rgba(0,0,255,0.03)); 
             background-size: 100% 2px, 3px 100%; 
         }
 
-        #academy-bar { 
-            height:40px; 
-            background:#161b22; 
-            border-bottom:1px solid var(--border); 
-            display:flex; 
-            align-items:center; 
-            padding:0 20px; 
-            gap:20px; 
-            font-size:0.8rem; 
-        }
-        
-        #progress-container { flex:1; background:#30363d; height:4px; border-radius:2px; position: relative; }
-        #progress-fill { 
-            height:100%; 
-            background:linear-gradient(90deg, var(--accent-color), #58a6ff); 
-            width:0%; 
-            transition:width 0.5s; 
-            box-shadow:0 0 10px var(--accent-color); 
-        }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 20% { transform: translate(-3px, 0px); } 100% { transform: translate(0px, 0px); } }
+        .glitch-shake { animation: shake 0.2s 2; background: rgba(248, 81, 73, 0.05) !important; }
 
-        #game-layout { 
-            display:grid; 
-            grid-template-columns:1fr 380px; 
-            grid-template-rows:1fr 200px; 
-            gap:10px; 
-            padding:10px; 
-            flex-grow:1; 
-            visibility:hidden; 
-        }
+        #academy-bar { height:40px; background:#161b22; border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:15px; font-size:0.75rem; }
+        #progress-container { flex:1; background:#30363d; height:6px; border-radius:3px; overflow:hidden; }
+        #progress-fill { height:100%; background:linear-gradient(90deg, var(--accent-color), #58a6ff); width:0%; transition:width 0.8s; }
+
+        #game-layout { display: grid; grid-template-columns: 1fr 350px; grid-template-rows: 1fr 180px; gap:10px; padding:10px; flex-grow:1; visibility:hidden; }
+        @media (max-width: 900px) { #game-layout { grid-template-columns: 1fr; grid-template-rows: 1fr 150px 150px; overflow-y: auto; } #code-pane { display: none; } }
 
         .pane { background:var(--bg-color); border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; overflow:hidden; }
-        .pane-header { 
-            background:#161b22; 
-            padding:8px 12px; 
-            font-size:0.7rem; 
-            color:#8b949e; 
-            border-bottom:1px solid var(--border); 
-            display:flex; 
-            justify-content:space-between; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .pane-header { background:#161b22; padding:8px 12px; font-size:0.65rem; color:#8b949e; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; text-transform: uppercase; }
 
-        #output { 
-            flex-grow:1; 
-            padding:15px; 
-            overflow-y:auto; 
-            display:flex; 
-            flex-direction:column-reverse; 
-            font-size:0.95rem; 
-            line-height:1.6; 
-        }
+        #output { flex-grow:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column-reverse; font-size:0.9rem; line-height:1.5; white-space: pre-wrap; }
+        .prompt-line { display:flex; padding:12px; background:#0d1117; border-top:1px solid var(--border); }
+        #command-input { flex-grow:1; background:transparent; border:none; color:#fff; outline:none; font-family:inherit; font-size:1rem; }
 
-        .prompt-line { display:flex; padding:12px; background:#0d1117; border-top:1px solid var(--border); align-items: center; }
-        #command-input { 
-            flex-grow:1; 
-            background:transparent; 
-            border:none; 
-            color:#fff; 
-            outline:none; 
-            font-family:inherit; 
-            font-size:1rem; 
-        }
+        #code-content, #log-stream { padding:10px; font-size:0.75rem; overflow-y:auto; white-space: pre-wrap; }
+        #code-content { color: #d2a8ff; }
 
-        #code-content { padding:15px; font-size:0.85rem; white-space:pre-wrap; color:#d1d5da; line-height:1.4; overflow-y:auto; }
-        #log-stream { padding:10px; font-size:0.75rem; color:#8b949e; overflow-y:auto; background:#161b22; height:100%; }
+        .modal { position:fixed; inset:0; background:rgba(1,4,9,0.95); z-index:2000; display:flex; align-items:center; justify-content:center; padding: 20px; }
+        .modal-content { background:#161b22; border:1px solid var(--accent-color); padding:30px; max-width:500px; border-radius:12px; text-align: center; }
 
-        .modal { position:fixed; inset:0; background:rgba(1,4,9,0.98); z-index:2000; display:flex; align-items:center; justify-content:center; }
-        .modal-content { 
-            background:#161b22; 
-            border:1px solid var(--accent-color); 
-            padding:40px; 
-            max-width:620px; 
-            border-radius:12px; 
-            box-shadow:0 0 30px rgba(46,160,67,0.2); 
-        }
-
+        button { padding: 10px 20px; cursor: pointer; background: var(--accent-color); border: none; color: #010409; font-weight: bold; border-radius: 4px; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: white; margin-left: 10px; }
+        
         .lola { color:var(--accent-color); font-weight:bold; }
         .error { color:var(--error-color); }
-        .success { color:var(--accent-color); text-shadow:0 0 5px var(--accent-color); }
-        .highlight { color:var(--highlight-color); font-weight:bold; }
-        .debrief { background:rgba(46,160,67,0.1); border-left:4px solid var(--accent-color); padding:12px; margin:8px 0; font-size: 0.85rem; border-radius: 0 4px 4px 0; }
-        
-        button {
-            padding: 12px 24px;
-            cursor: pointer;
-            background: var(--accent-color);
-            border: none;
-            color: #010409;
-            font-weight: bold;
-            border-radius: 6px;
-            transition: opacity 0.2s;
-        }
-        button:hover { opacity: 0.8; }
+        .success { color:var(--accent-color); }
+        .highlight { color:var(--highlight-color); }
+        .matrix { color: #00ff41; text-shadow: 0 0 5px #00ff41; font-size: 0.8rem; }
     </style>
 </head>
 <body onclick="document.getElementById('command-input').focus()">
 
 <div id="briefing-screen" class="modal">
     <div class="modal-content">
-        <h1 style="color:var(--accent-color); margin-top:0;">📡 INCOMING TRANSMISSION</h1>
-        <p style="line-height:1.6; font-size:1.1rem;">Vibe-Station Delta is dark. Manual override required.<br>We need a Cadet to <span class="highlight">orchestrate AI agents</span> and restore MCP protocols.</p>
-        <div style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
-            <label style="display:block; margin-bottom:10px; font-size:0.8rem; color:var(--prompt-color);">ENTER CALLSIGN:</label>
-            <input type="text" id="callsign-input" placeholder="e.g. Maverick" style="background:#0d1117; border:1px solid var(--border); color:white; padding:12px; width:100%; border-radius:6px; font-family:inherit; outline:none;">
-            <button onclick="bootAcademy()" style="margin-top:20px; width:100%;">ACCEPT MISSION</button>
+        <h2 style="color:var(--accent-color)">📡 VIBE_OS ELITE v2.9.1</h2>
+        <p>Orchestrate AI agents. Save Station Delta.</p>
+        <input type="text" id="callsign-input" placeholder="ENTER CALLSIGN" style="background:#0d1117; border:1px solid var(--border); color:white; padding:10px; width:100%; border-radius:4px; margin: 15px 0;">
+        <div style="margin-bottom: 15px;">
+            <input type="checkbox" id="hardmode-toggle"> <label for="hardmode-toggle" style="font-size: 0.8rem;">HARD MODE (No Hints)</label>
         </div>
+        <button onclick="bootAcademy()">INITIALIZE</button>
+        <button class="btn-outline" onclick="resetSave()">RESET SAVE</button>
     </div>
 </div>
 
 <div id="academy-bar">
-    <span style="font-weight:bold; color:var(--accent-color)">VIBE_OS v2.9 • AGENTIC</span>
+    <span style="font-weight:bold; color:var(--accent-color)">VIBE ACADEMY</span>
     <div id="progress-container"><div id="progress-fill"></div></div>
     <span id="phase-label">PHASE 1/13</span>
-    <button onclick="alert('🏆 Achievements:\n• Shell Access\n• Pipe Master\n• MCP Architect\n• Rogue Hunter')" style="background:none;border:none;color:#8b949e;padding:0;">🏆</button>
 </div>
 
 <div id="game-layout">
     <div class="pane">
-        <div class="pane-header">
-            <span>TERMINAL — <span id="user-display">cadet</span>@vibe-station: <span id="path-display">/home</span></span>
-            <span id="status-tag" class="success">● ONLINE</span>
-        </div>
+        <div class="pane-header"><span>TERMINAL — <span id="user-display">cadet</span></span><span id="status-tag" class="success">● ONLINE</span></div>
         <div id="output"></div>
         <div class="prompt-line">
-            <span style="color:var(--prompt-color); margin-right:8px;">❯</span>
-            <input type="text" id="command-input" spellcheck="false" autocomplete="off" placeholder="Initializing...">
+            <span style="color:var(--prompt-color); margin-right:10px;">❯</span>
+            <input type="text" id="command-input" spellcheck="false" autocomplete="off">
         </div>
     </div>
-
     <div id="code-pane" class="pane">
-        <div class="pane-header">ACTIVE_ORCHESTRATION.log <span style="color:#2ea043;font-size:0.7rem;">● LIVE</span></div>
+        <div class="pane-header">BUILD_STREAM.log</div>
         <div id="code-content"></div>
     </div>
-
     <div id="logs-pane" class="pane">
-        <div class="pane-header">SYSTEM TELEMETRY <span id="tail-status" style="color:#f0883e;">(live)</span></div>
+        <div class="pane-header">TELEMETRY <span id="tail-status" style="color:#8b949e;">(idle)</span></div>
         <div id="log-stream"></div>
     </div>
 </div>
 
 <div id="grad-modal" class="modal" style="display:none;">
-    <div class="modal-content" style="text-align:center;">
-        <h1 class="success">🎖️ MISSION COMPLETE</h1>
-        <p id="final-score" style="font-size:1.2rem; margin:20px 0;"></p>
-        <p>You have successfully demystified Agentic AI and CLI workflows.</p>
-        <button onclick="exportManifest()" style="margin:10px;">📤 DOWNLOAD MANIFEST</button>
-        <button onclick="location.reload()" style="background:transparent; border:1px solid var(--border); color:white; margin:10px;">REBOOT ACADEMY</button>
+    <div class="modal-content">
+        <h1 class="success">🎖️ CERTIFIED</h1>
+        <p id="final-score"></p>
+        <button onclick="exportManifest()">DOWNLOAD MANIFEST</button>
     </div>
 </div>
 
 <script>
-    let cadetName = "Cadet", currentPath = '/home', phase = 1, lesson = 0, failCount = 0, totalHints = 0;
-    let commandHistory = [], historyIndex = -1;
-    let rogueActive = false;
-    let tailFollowing = false;
-    let agents = { Engineer: { status: "idle", context: 420 }, Captain: { status: "idle", context: 890 } };
+    // ================================================
+    // VIBE CADET ACADEMY — AGENTIC CLI TRAINER
+    // Full version with easter eggs, hard mode, save system
+    // Ready for GitHub — just save as index.html
+    // ================================================
 
-    const vfs = { /* unchanged from your version */ 
+    let state = JSON.parse(localStorage.getItem('vibe_academy_save')) || {
+        phase: 1, lesson: 0, totalHints: 0, cadetName: "Cadet", hardMode: false
+    };
+
+    let currentPath = '/home';
+    let commandHistory = [];
+    let historyIndex = -1;
+    let tailFollowing = false;
+    let rogueActive = false;
+    let failCount = 0;
+
+    const asciiArt = {
+        devil: ` (҂◡_◡) \n <,︻╦╤─ ҉ - - - ERROR\n / \\ `,
+        ghost: ` .---.\n/     \\\n| () () |  <-- ROGUE DETECTED\n \\  ^  /\n  |||||\n  ||||| `
+    };
+
+    const vfs = {
         '/home': { type: 'dir', children: ['projects', 'README.txt', 'manual.txt', 'logs.txt', 'restrict_access.key'] },
         '/home/README.txt': { type: 'file', content: 'STATION DELTA: Emergency Protocol Active.' },
         '/home/manual.txt': { type: 'file', content: 'Pro tip: Type "man <command>" for technical specs.' },
@@ -202,76 +137,129 @@
 
     const helpDB = {
         'man': { desc: 'Display manual for a command', why: 'Learn any command without guessing.' },
-        'ls': { desc: 'List directory contents', why: 'See what files and folders exist.' },
-        'pwd': { desc: 'Print working directory', why: 'Know exactly where you are.' },
+        'ls': { desc: 'List directory contents', why: 'See what files exist.' },
+        'pwd': { desc: 'Print working directory', why: 'Know where you are.' },
         'cd': { desc: 'Change directory', why: 'Navigate the filesystem.' },
-        'cat': { desc: 'View file contents', why: 'Read files directly in the terminal.' },
+        'cat': { desc: 'View file contents', why: 'Read files in the terminal.' },
         'sudo': { desc: 'Execute as superuser', why: 'Gain temporary admin rights.' },
-        'grep': { desc: 'Search text in files', why: 'Filter large output for what matters.' },
-        'tail': { desc: 'Output the end of a file', why: 'Watch live logs in real time.' },
-        'ps': { desc: 'List running processes', why: 'See what agents are active.' },
-        'kill': { desc: 'Terminate a process', why: 'Stop rogue or broken agents.' },
+        'grep': { desc: 'Search text patterns', why: 'Filter large output.' },
+        'tail': { desc: 'Follow file endings', why: 'Watch live logs.' },
+        'ps': { desc: 'List running processes', why: 'Detect active agents.' },
+        'kill': { desc: 'Terminate a process', why: 'Stop rogue agents.' },
         'vibe': { desc: 'Agentic orchestration commands', why: 'Control AI agents from the CLI.' }
     };
 
-    const phases = [ /* your exact 13 phases — 100% unchanged */ null, /* ... all your phases ... */ ];
+    const phases = [null,
+        { title: "Standard Errors", lola: "Cadet, confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Run 'pwd'", response: "Path confirmed.", explanation: "pwd shows your system context." }] },
+        { title: "Privilege Escalation", lola: "Locked. Use 'sudo'.", objectives: [{ cmd: ["sudo cat restrict_access.key"], desc: "sudo cat", response: "Key: XJ-99", explanation: "Sudo overrides locks." }] },
+        { title: "Navigation", lola: "Go to 'projects'.", objectives: [{ cmd: ["cd projects"], desc: "cd projects", response: "Moved.", explanation: "cd is movement." }] },
+        { title: "Agent Status", lola: "Check agents.", objectives: [{ cmd: ["vibe status"], desc: "vibe status", response: "Idle.", explanation: "Monitor agent health." }] },
+        { title: "MCP Init", lola: "Initialize MCP.", objectives: [{ cmd: ["vibe mcp init"], desc: "vibe mcp init", response: "Online.", explanation: "MCP is the bridge." }] },
+        { title: "Tool Auth", lola: "Auth 'npm'.", objectives: [{ cmd: ["vibe auth --agent Engineer --tool npm"], desc: "vibe auth", response: "Auth'd.", explanation: "Explicit permissions." }] },
+        { title: "Piping Logs", lola: "Grep CRITICAL.", objectives: [{ cmd: ["cat logs.txt | grep CRITICAL"], desc: "Pipe to grep", response: "Power failing!", explanation: "Pipes connect tools." }] },
+        { title: "LLM Reasoning", lola: "vibe explain.", objectives: [{ cmd: ["cat logs.txt | vibe explain"], desc: "vibe explain", response: "PID 1337!", explanation: "LLM reasoning filter." }] },
+        { title: "Structured Info", lola: "Use --json.", objectives: [{ cmd: ["vibe explain --json"], desc: "Use --json", response: '{"target": "1337"}', explanation: "JSON is agent-speak." }] },
+        { title: "Prompt Governance", lola: "vibe prompt --edit.", objectives: [{ cmd: ["vibe prompt --edit"], desc: "vibe prompt", response: "Fixed.", explanation: "Prompts are guardrails." }] },
+        { title: "Detection", lola: "Run 'ps'.", objectives: [{ cmd: ["ps"], desc: "ps", response: "Found.", explanation: "ps lists agents." }] },
+        { title: "Containment", lola: "Kill 1337.", objectives: [{ cmd: ["kill 1337"], desc: "kill 1337", response: "Neutralized.", explanation: "Kill stops the loop." }] },
+        { title: "Final Build", lola: "vibe build.", objectives: [{ cmd: ["vibe build"], desc: "vibe build", response: "Launch!", explanation: "Success." }] }
+    ];
 
-    function log(text, type = '') { /* your exact log function */ }
-    function sysLog(msg) { /* your exact sysLog */ }
+    function saveGame() { localStorage.setItem('vibe_academy_save', JSON.stringify(state)); }
+    function resetSave() { localStorage.removeItem('vibe_academy_save'); location.reload(); }
 
-    function updateUI() { /* your exact updateUI */ }
+    function log(text, type = '') {
+        const entry = document.createElement('div');
+        if (type === 'lola') entry.innerHTML = `<span class="lola">L.O.L.A.: </span>${text}`;
+        else if (type === 'success') entry.classList.add('success');
+        else if (type === 'error') entry.classList.add('error');
+        else if (type === 'highlight') entry.classList.add('highlight');
+        else if (type === 'matrix') entry.classList.add('matrix');
+        else if (type === 'debrief') entry.innerHTML = `<div class="debrief">${text}</div>`;
+        else entry.textContent = text;
+        document.getElementById('output').insertBefore(entry, document.getElementById('output').firstChild);
+    }
 
-    function bootAcademy() { /* your exact bootAcademy */ }
+    function sysLog(msg) {
+        const div = document.createElement('div');
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        document.getElementById('log-stream').appendChild(div);
+        document.getElementById('log-stream').scrollTop = 9999;
+    }
+
+    function updateUI() {
+        document.getElementById('phase-label').textContent = `PHASE ${state.phase}/13`;
+        document.getElementById('progress-fill').style.width = `${(state.phase / 13) * 100}%`;
+    }
 
     function handleCommand(raw) {
-        if (!raw.trim()) return;
         const val = raw.trim();
+        if (!val) return;
         commandHistory.unshift(val);
-        historyIndex = -1;
         log(`❯ ${val}`);
-
         const lower = val.toLowerCase();
-        const parts = lower.split(' ');
 
-        // === NEW: man system ===
+        // === EASTER EGGS ===
+        if (lower.includes('rm -rf /') || lower.includes('rm -fr /')) {
+            if (!lower.includes('sudo')) {
+                log("Permission denied. (Nice try)", "error");
+            } else {
+                log("CRITICAL: ROOT DELETION INITIALIZED", "error");
+                log("DELETING /home...", "error");
+                setTimeout(() => {
+                    document.getElementById('output').innerHTML = "";
+                    document.body.style.background = "#000";
+                    log("FATAL ERROR: OS NOT FOUND", "matrix");
+                }, 1500);
+                setTimeout(() => {
+                    document.body.style.background = "";
+                    log("L.O.L.A.: Recovery complete. Please don't do that again, Cadet.", "lola");
+                    updateUI();
+                }, 4000);
+            }
+            return;
+        }
+
+        if (lower === 'vibe delete world') {
+            log("INITIATING WORLD_END.SH...", "error");
+            document.body.style.filter = "brightness(0)";
+            setTimeout(() => {
+                document.body.style.filter = "";
+                log("L.O.L.A.: Request intercepted.", "lola");
+            }, 2000);
+            return;
+        }
+
+        // === CORE COMMANDS ===
         if (lower.startsWith('man ')) {
-            const cmd = parts[1];
+            const cmd = lower.split(' ')[1];
             if (helpDB[cmd]) {
                 log(`=== ${cmd.toUpperCase()} MANUAL ===`, 'highlight');
                 log(helpDB[cmd].desc);
-                log(`Why it matters: ${helpDB[cmd].why}`);
+                log(`Why: ${helpDB[cmd].why}`);
             } else {
-                log("=== VIBE_OS FIELD MANUAL ===", 'highlight');
-                log("Available: ls, pwd, cd, cat, sudo, grep, tail, ps, kill, vibe");
-                log("Type 'man <command>' for details.");
+                log("Type 'man <cmd>' for: ls, pwd, cd, cat, sudo, grep, tail, ps, kill, vibe", 'highlight');
             }
-            checkObjective(val);
-            return;
         }
-
-        // === NEW: tail -f live follow ===
-        if (lower === 'tail -f' || lower === 'tail -f logs.txt') {
+        else if (lower === 'tail -f' || lower === 'tail -f logs.txt') {
             tailFollowing = true;
             document.getElementById('tail-status').innerHTML = '● FOLLOWING';
-            log("Now following live telemetry (tail -f enabled).", 'success');
-            checkObjective(val);
-            return;
+            log("Telemetry follow enabled.", 'success');
         }
-
-        // Basic commands (your originals + fixes)
-        if (lower === 'ls') log(vfs[currentPath].children.join('  '));
+        else if (lower === 'ls') log(vfs[currentPath].children.join('  '));
         else if (lower === 'pwd') log(currentPath);
         else if (lower === 'ps') {
             log("PID 1 | vibe_kernel");
-            if (phase >= 11 && rogueActive) log("PID 1337 | rogue-ai (MALICIOUS)", 'error');
+            if (state.phase >= 11 && rogueActive) log(asciiArt.ghost, 'error');
         }
-        else if (lower === 'vibe status') {
-            log(`ENGINEER: [Context 420] Thinking...`);
-            log(`CAPTAIN: [Context 890] Idle.`);
+        else if (lower.startsWith('cd ')) {
+            const dir = lower.split(' ')[1];
+            if (dir === '..') currentPath = '/home';
+            else if (vfs[currentPath + '/' + dir]) currentPath += '/' + dir;
+            else log(`cd: ${dir}: Not found`, 'error');
         }
-        else if (lower.startsWith('cd ')) { /* your cd logic */ }
         else if (lower === 'cat restrict_access.key' && !lower.includes('sudo')) log("Permission denied", 'error');
-        else if (lower.includes('sudo cat restrict_access.key')) log("Access Granted. Key: XJ-99", 'success');
+        else if (lower.includes('sudo cat restrict_access.key')) log("Key: XJ-99", 'success');
         else if (lower.includes('cat logs.txt | grep critical')) log("CRITICAL: Power failing\nCRITICAL: Escape Pod locked");
         else if (lower.includes('cat logs.txt | vibe explain')) log("LLM: System failing due to rogue-ai PID 1337.", 'lola');
         else if (lower.includes('vibe explain --json')) log('{"status": "failure", "target": "1337"}', 'lola');
@@ -279,43 +267,116 @@
         else if (lower === 'vibe mcp init') log("MCP Server Online.", 'success');
         else if (lower.includes('vibe prompt --edit')) log("System prompt updated.", 'success');
         else if (lower.startsWith('kill 1337')) {
-            if (phase >= 12) { log("Terminating rogue agent...", "success"); rogueActive = false; }
-            else log("Permission denied: Process protected.", "error");
+            if (state.phase >= 12) { log("Agent destroyed.", "success"); rogueActive = false; }
+            else log("Permission denied: Root bypass required.", "error");
         }
-        else if (lower === 'vibe build' && phase === 13) streamBuild();
+        else if (lower === 'vibe status') log("ENGINEER: Context 420 | CAPTAIN: Idle");
+        else if (lower.includes('vibe build') && state.phase === 13) streamBuild();
 
         checkObjective(val);
         updateUI();
     }
 
-    function streamBuild() { /* your exact streamBuild */ }
+    function checkObjective(val) {
+        const obj = phases[state.phase]?.objectives[state.lesson];
+        if (!obj) return;
 
-    function checkObjective(val) { /* your exact checkObjective */ }
+        const matched = obj.cmd.some(c => val.toLowerCase().includes(c.toLowerCase()));
+        if (matched) {
+            log(obj.response, 'lola');
+            log(obj.explanation, 'debrief');
+            state.lesson++;
+            if (state.lesson >= phases[state.phase].objectives.length) setTimeout(nextPhase, 1000);
+            saveGame();
+        } else {
+            failCount++;
+            if (failCount >= 3) {
+                document.body.classList.add('glitch-shake');
+                setTimeout(() => document.body.classList.remove('glitch-shake'), 400);
+                if (!state.hardMode) log(`HINT: Try '${obj.desc}'`, 'highlight');
+                state.totalHints++;
+                failCount = 0;
+            }
+        }
+    }
 
-    function nextPhase() { /* your exact nextPhase */ }
+    function nextPhase() {
+        if (state.phase >= 13) { finishGame(); return; }
+        state.phase++;
+        state.lesson = 0;
+        if (state.phase === 11) rogueActive = true;
+        log(`--- PHASE ${state.phase}: ${phases[state.phase].title} ---`, 'success');
+        log(phases[state.phase].lola, 'lola');
+        saveGame();
+        updateUI();
+    }
 
-    function finishGame() { /* your exact finishGame */ }
+    function streamBuild() {
+        const lines = ["Initializing build...", "Orchestrating agents...", "Deploying MCP...", "Ignition!"];
+        let i = 0;
+        const target = document.getElementById('code-content');
+        target.innerHTML = "";
+        const interval = setInterval(() => {
+            if (i >= lines.length) { clearInterval(interval); return; }
+            target.innerHTML += `> ${lines[i]}\n`;
+            sysLog(lines[i]);
+            i++;
+        }, 500);
+    }
 
-    function exportManifest() { /* your exact exportManifest */ }
+    function bootAcademy() {
+        state.cadetName = document.getElementById('callsign-input').value.trim() || "Cadet";
+        state.hardMode = document.getElementById('hardmode-toggle').checked;
+        document.getElementById('user-display').innerText = state.cadetName;
+        document.getElementById('briefing-screen').style.display = 'none';
+        document.getElementById('game-layout').style.visibility = 'visible';
+        log(phases[state.phase].lola, 'lola');
+        updateUI();
+    }
 
-    // Keyboard support (your version)
-    document.getElementById('command-input').addEventListener('keydown', (e) => { /* your exact keyboard code */ });
+    function finishGame() {
+        document.getElementById('final-score').innerText = `Proficiency Rating: ${100 - state.totalHints}%`;
+        document.getElementById('grad-modal').style.display = 'flex';
+    }
 
-    // Auto-generate some live telemetry when tail -f is active
+    function exportManifest() {
+        const reportCard = {
+            candidate: state.cadetName,
+            certification: "Elite Agentic AI & CLI Orchestrator",
+            score: `${100 - state.totalHints}%`,
+            timestamp: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(reportCard, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Vibe_Manifest_${state.cadetName}.json`;
+        a.click();
+    }
+
+    // Keyboard
+    document.getElementById('command-input').addEventListener('keydown', (e) => {
+        const input = e.target;
+        if (e.key === 'Enter') {
+            handleCommand(input.value);
+            input.value = '';
+        }
+    });
+
+    // Live telemetry for tail -f
     setInterval(() => {
         if (tailFollowing) {
-            const messages = [
-                "AGENT: Engineer thinking...",
-                "MCP: Context window 87% full",
-                "WARNING: Rogue activity detected",
-                "CAPTAIN: Launch sequence ready"
-            ];
+            const messages = ["AGENTS: Synchronizing...", "MCP: Port 8080 Active", "INFO: Kernel Stable"];
             sysLog(messages[Math.floor(Math.random() * messages.length)]);
         }
-    }, 1200);
+    }, 1800);
 
-    // Boot the game
-    // (bootAcademy already in your code)
+    // Auto-resume if saved progress exists
+    if (state.phase > 1) {
+        document.getElementById('briefing-screen').style.display = 'none';
+        document.getElementById('game-layout').style.visibility = 'visible';
+        log(phases[state.phase].lola, 'lola');
+        updateUI();
+    }
 </script>
 </body>
 </html>
