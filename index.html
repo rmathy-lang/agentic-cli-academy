@@ -145,7 +145,24 @@
 
     const phases = [null,
         { title: "Standard Errors", lola: "Cadet, first we need to know where we are. Use **'pwd'** (Print Working Directory) to confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Type 'pwd'", response: "Path confirmed.", explanation: "In a terminal, 'pwd' is your map. It tells you exactly which folder you are currently standing in." }] },
-        { title: "Privilege Escalation", lola: "The security key is locked. To read it, you must use **'sudo'** (SuperUser Do) to act as an admin, combined with **'cat'** (Concatenate) to read the file. Try: **'sudo cat restrict_access.key'**", objectives: [{ cmd: ["sudo cat restrict_access.key"], desc: "Type 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "'sudo' is like 'Simon Says' for computers—it forces the system to let you do things normally restricted." }] },
+        { 
+            title: "Privilege Escalation", 
+            lola: "The system is locked down. First, use **'ls'** to find the restricted access key.", 
+            objectives: [
+                { 
+                    cmd: ["ls"], 
+                    desc: "Type 'ls'", 
+                    response: "I see it: 'restrict_access.key'.", 
+                    explanation: "Before you can open a lock, you have to find the door." 
+                },
+                { 
+                    cmd: ["sudo cat restrict_access.key"], 
+                    desc: "Use 'sudo cat restrict_access.key'", 
+                    response: "Key: XJ-99", 
+                    explanation: "Notice how a normal 'cat' would fail here? 'sudo' (SuperUser Do) is what gives you the admin power to bypass that 'Permission Denied' error." 
+                }
+            ] 
+        },
         { title: "Navigation", lola: "Good. Now we need to find the AI files. Use **'cd'** (Change Directory) to move into the projects folder. Type: **'cd projects'**", objectives: [{ cmd: ["cd projects"], desc: "Type 'cd projects'", response: "Moved to projects.", explanation: "'cd' is how you walk through the doors of different folders in a computer's memory." }] },
         { title: "Agent Status", lola: "Let's check our AI agents. Use the custom command **'vibe status'** to see if they are awake.", objectives: [{ cmd: ["vibe status"], desc: "Type 'vibe status'", response: "Agents: Idle.", explanation: "In this system, 'vibe' is our control tool for AI agents. Checking status ensures no one is 'frozen'." }] },
         { title: "MCP Init", lola: "We need a bridge between our logic and our tools. Initialize the **MCP** (Model Context Protocol) by typing **'vibe mcp init'**.", objectives: [{ cmd: ["vibe mcp init"], desc: "Type 'vibe mcp init'", response: "MCP Online.", explanation: "MCP is a real-world standard that lets AI agents use local tools safely." }] },
