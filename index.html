@@ -145,7 +145,7 @@
 
     const phases = [null,
         { title: "Standard Errors", lola: "Cadet, confirm your location.", objectives: [{ cmd: ["pwd"], desc: "Run 'pwd'", response: "Path confirmed.", explanation: "pwd shows your system context." }] },
-        { title: "Privilege Escalation", lola: "Locked. Use 'sudo'.", objectives: [{ cmd: ["sudo cat restrict_access.key"], desc: "sudo cat", response: "Key: XJ-99", explanation: "Sudo overrides locks." }] },
+        { title: "Privilege Escalation", lola: "The access key is locked. You need 'sudo' to read it.", objectives: [{ cmd: ["sudo cat restrict_access.key"], desc: "Use 'sudo cat restrict_access.key'", response: "Key: XJ-99", explanation: "Sudo allows agents to override restricted file locks." }] },
         { title: "Navigation", lola: "Go to 'projects'.", objectives: [{ cmd: ["cd projects"], desc: "cd projects", response: "Moved.", explanation: "cd is movement." }] },
         { title: "Agent Status", lola: "Check agents.", objectives: [{ cmd: ["vibe status"], desc: "vibe status", response: "Idle.", explanation: "Monitor agent health." }] },
         { title: "MCP Init", lola: "Initialize MCP.", objectives: [{ cmd: ["vibe mcp init"], desc: "vibe mcp init", response: "Online.", explanation: "MCP is the bridge." }] },
