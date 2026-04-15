@@ -116,12 +116,13 @@
         .highlight { color: var(--highlight-color); font-weight: bold; }
         .cmd-echo { color: #8b949e; }
         .code-stream { color: #2ea043; font-size: 0.8rem; opacity: 0.7; }
+        .success { color: var(--accent-color); }
 
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(1,4,9,0.9);
+            background: rgba(1,4,9,0.95);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -147,6 +148,7 @@
     <span id="cadet-name-display">Cadet</span>
     <div id="progress-bar"><div id="progress-fill"></div></div>
     <span id="phase-display">Phase 1/8</span>
+    <button onclick="showAchievements()" style="background:none;border:1px solid #30363d;color:#8b949e;padding:2px 8px;border-radius:3px;cursor:pointer;">🏆</button>
 </div>
 
 <div id="game-container">
@@ -168,7 +170,7 @@
     <div id="agent-pane" class="pane hidden">
         <div class="pane-header">Active Crew</div>
         <div id="agent-list">
-            <div id="empty-agents" style="color: #484f58; font-style: italic; padding: 20px; text-align:center;">Crew Locked</div>
+            <div id="empty-agents" style="color: #484f58; font-style: italic; padding: 20px; text-align:center;">Crew Locked — Complete Phase 5</div>
         </div>
     </div>
 
@@ -178,86 +180,209 @@
     </div>
 </div>
 
+<!-- Graduation Modal -->
 <div id="graduation-modal" class="modal">
     <div class="modal-content">
         <h1 style="color:var(--accent-color);">🎖️ GRADUATION DAY</h1>
-        <p id="grad-text"></p>
-        <button onclick="location.reload()" style="background:var(--accent-color);border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-weight:bold;">Start New Mission</button>
+        <h2 id="grad-name" style="margin:10px 0 20px;font-size:1.4rem;"></h2>
+        <p style="color:#8b949e;">You have mastered the Vibe Coding workflow.<br>Terminal, Git, Agents, Prompting, and Shipping — all unlocked.</p>
+        <div style="background:#21262d;padding:15px;border-radius:6px;margin:20px 0;">
+            <strong>Certificate of Completion</strong><br>
+            <em>Vibe Cadet Academy • Class of 2026</em>
+        </div>
+        <button onclick="shareOnX()" style="background:var(--accent-color);color:#010409;border:none;padding:12px 24px;border-radius:4px;font-weight:bold;margin-right:10px;">SHARE ON X</button>
+        <button onclick="restartAcademy()" style="background:transparent;border:1px solid #8b949e;color:#8b949e;padding:12px 20px;border-radius:4px;">Replay Academy</button>
+        <div onclick="closeModal()" style="margin-top:25px;color:#8b949e;cursor:pointer;font-size:0.85rem;">Close</div>
+    </div>
+</div>
+
+<!-- Achievements Modal -->
+<div id="achievements-modal" class="modal">
+    <div class="modal-content" style="max-width:520px;">
+        <h2 style="color:var(--highlight-color);">🏆 Academy Achievements</h2>
+        <div id="achievements-list" style="text-align:left;max-height:400px;overflow-y:auto;padding:10px;"></div>
+        <button onclick="closeModal()" style="margin-top:20px;background:transparent;border:1px solid #8b949e;color:#8b949e;padding:10px 24px;border-radius:4px;cursor:pointer;">Close</button>
     </div>
 </div>
 
 <script>
+    // ==================== CORE STATE ====================
+    let cadetName = "Cadet";
     let gameState = {
-        phase: 1, lesson: 0, agents: [], sandboxMode: false,
+        phase: 1,
+        lesson: 0,
+        agents: [],
+        completedPhases: [],
+        achievements: [],
+        sandboxMode: false
     };
 
+    // ==================== PHASES (your latest progression) ====================
     const phases = [
         null,
         {
             title: "Phase 1: Basic Movement",
             lola: "The SS StackOverflow is dark. Let's look around.",
-            objectives: [{ cmd: ["eza", "ls"], desc: "List files", response: "Good. You see 'projects' and 'README.txt'." },
-                         { cmd: ["cd projects"], desc: "Enter projects", response: "Moving forward." }]
+            objectives: [
+                { cmd: ["eza", "ls"], desc: "List files", response: "Good. You see 'projects' and 'README.txt'." },
+                { cmd: ["cd projects"], desc: "Enter projects", response: "Moving forward." }
+            ]
         },
         {
             title: "Phase 2: File Creation",
             lola: "We need a manifest. Create a file called 'manifest.txt'.",
-            objectives: [{ cmd: ["touch manifest.txt"], desc: "Create a file", response: "Manifest created." }]
+            objectives: [
+                { cmd: ["touch manifest.txt", "echo > manifest.txt"], desc: "Create a file", response: "Manifest created." }
+            ]
         },
         {
             title: "Phase 3: Version Control",
             lola: "Let's save our state using Git.",
-            objectives: [{ cmd: ["cd game_v1"], desc: "Enter project", response: "Inside game_v1." },
-                         { cmd: ["git init"], desc: "Init repo", response: "Timeline established." }]
+            objectives: [
+                { cmd: ["cd game_v1"], desc: "Enter project", response: "Inside game_v1." },
+                { cmd: ["git init"], desc: "Init repo", response: "Timeline established." }
+            ]
         },
         {
             title: "Phase 4: Packages",
             lola: "Time to install our Vibe-Engine.",
-            objectives: [{ cmd: ["bun install"], desc: "Install dependencies", response: "Dependencies installed instantly." }]
+            objectives: [
+                { cmd: ["bun install"], desc: "Install dependencies", response: "Dependencies installed instantly." }
+            ]
         },
         {
             title: "Phase 5: Orchestration",
             lola: "Manual work ends here. Unlock the Crew system.",
-            objectives: [{ cmd: ["vibe create --role manager --name Captain"], desc: "Create Manager", response: "Captain is online! Sidebar unlocked." }]
+            objectives: [
+                { cmd: ["vibe create --role manager --name Captain"], desc: "Create Manager", response: "Captain is online! Sidebar unlocked." }
+            ]
         },
         {
             title: "Phase 6: The Specialist",
             lola: "The Captain needs an Engineer.",
-            objectives: [{ cmd: ["vibe create --role specialist --name Engineer"], desc: "Create Engineer", response: "Engineer is ready for specialist tasks." }]
+            objectives: [
+                { cmd: ["vibe create --role specialist --name Engineer"], desc: "Create Engineer", response: "Engineer is ready for specialist tasks." }
+            ]
         },
         {
             title: "Phase 7: Intelligence",
             lola: "Talk to the Captain. Ask him about 'MCP'.",
-            objectives: [{ cmd: ["prompt agent Captain \"Explain MCP\""], desc: "Prompt the agent", response: "Captain has answered in the terminal." }]
+            objectives: [
+                { cmd: ["prompt agent Captain \"Explain MCP\""], desc: "Prompt the agent", response: "Captain has answered in the terminal." }
+            ]
         },
         {
             title: "Phase 8: The Final Ship",
             lola: "Commander, it's time to build the escape pod landing page.",
-            objectives: [{ cmd: ["vibe build escape-pod"], desc: "Final build command", response: "Build complete. We are going home." }]
+            objectives: [
+                { cmd: ["vibe build escape-pod"], desc: "Final build command", response: "Build complete. We are going home." }
+            ]
         }
     ];
 
+    // Command aliases for forgiving input
+    const commandAliases = {
+        "ls": "eza",
+        "dir": "eza",
+        "echo > manifest.txt": "touch manifest.txt"
+    };
+
+    // ==================== DOM REFERENCES ====================
+    const output = document.getElementById('output');
+    const input = document.getElementById('command-input');
+    const systemLogs = document.getElementById('system-logs');
+    const agentList = document.getElementById('agent-list');
+
+    // ==================== LOGGING ====================
     function log(msg, type = 'system-msg', target = output) {
         const div = document.createElement('div');
         div.className = `log-entry ${type}`;
         if (type === 'lola-msg') div.innerHTML = `<span class="lola-msg">L.O.L.A.: </span>${msg}`;
+        else if (type === 'agent-msg') div.innerHTML = `<span class="agent-msg">[AGENT] </span>${msg}`;
         else div.textContent = msg;
+
         target.insertBefore(div, target.firstChild || null);
         if (target === output) target.scrollTop = 0;
+        else target.scrollTop = target.scrollHeight;
     }
 
-    function addAgent(role, name) {
+    // ==================== FUZZY MATCHING + SMART HINTS ====================
+    function fuzzyMatch(input, expectedList) {
+        const clean = input.toLowerCase().trim();
+        for (let expected of expectedList) {
+            const exp = expected.toLowerCase().trim();
+            if (clean === exp) return true;
+            if (commandAliases[clean] === exp) return true;
+            if (clean.includes(exp) || exp.includes(clean)) return true;
+        }
+        return false;
+    }
+
+    // ==================== PROGRESS & SAVE SYSTEM ====================
+    function saveProgress() {
+        localStorage.setItem('vibeCadetAcademySave', JSON.stringify(gameState));
+    }
+
+    function loadProgress() {
+        const saved = localStorage.getItem('vibeCadetAcademySave');
+        if (saved) {
+            const data = JSON.parse(saved);
+            gameState = { ...gameState, ...data };
+            if (gameState.agents.length > 0) {
+                document.getElementById('agent-pane').classList.remove('hidden');
+                document.getElementById('logs-pane').classList.remove('hidden');
+                gameState.agents.forEach(a => addAgent(a.role, a.name, true));
+            }
+        }
+    }
+
+    function updateProgress() {
+        const progress = ((gameState.phase - 1) / 8) * 100;
+        document.getElementById('progress-fill').style.width = `${progress}%`;
+        document.getElementById('phase-display').textContent = `Phase ${gameState.phase}/8`;
+    }
+
+    // ==================== ACHIEVEMENTS ====================
+    function unlockAchievement(id, title) {
+        if (gameState.achievements.includes(id)) return;
+        gameState.achievements.push(id);
+        log(`🏆 ACHIEVEMENT UNLOCKED: ${title}`, 'highlight');
+        saveProgress();
+    }
+
+    function showAchievements() {
+        const container = document.getElementById('achievements-list');
+        container.innerHTML = gameState.achievements.length === 0 
+            ? '<p style="color:#8b949e;padding:15px;">No achievements yet — keep training, Cadet!</p>'
+            : gameState.achievements.map(a => `<div style="padding:10px;border-bottom:1px solid #30363d;">✅ ${a}</div>`).join('');
+        document.getElementById('achievements-modal').style.display = 'flex';
+    }
+
+    // ==================== AGENT SYSTEM ====================
+    function addAgent(role, name, silent = false) {
         document.getElementById('empty-agents').style.display = 'none';
-        document.getElementById('agent-pane').classList.remove('hidden');
-        document.getElementById('logs-pane').classList.remove('hidden');
         const card = document.createElement('div');
         card.className = 'agent-card';
-        card.innerHTML = `<strong>${name}</strong><br><small>${role}</small>`;
-        document.getElementById('agent-list').appendChild(card);
-        gameState.agents.push({name, role});
-        log(`[SYSTEM] ${name} initialized.`, 'agent-msg', systemLogs);
+        card.innerHTML = `<strong>${name}</strong><br><small>${role}</small><br><span style="color:var(--accent-color)">● ONLINE</span>`;
+        card.onclick = () => agentHelp(name);
+        agentList.appendChild(card);
+        
+        gameState.agents.push({role, name});
+        if (!silent) {
+            log(`[SYSTEM] ${name} initialized.`, 'agent-msg', systemLogs);
+        }
+        saveProgress();
     }
 
+    function agentHelp(name) {
+        if (gameState.sandboxMode) {
+            log(`${name}: Ready for any task, Cadet. What do you need?`, 'agent-msg');
+        } else {
+            log(`${name}: The next objective is shown above. Type it exactly or ask me for a hint!`, 'agent-msg');
+        }
+    }
+
+    // ==================== SPECIAL PHASE HANDLERS ====================
     function simulateBuild() {
         let lines = 0;
         const interval = setInterval(() => {
@@ -266,10 +391,14 @@
             if (lines > 15) {
                 clearInterval(interval);
                 log("🚀 ESCAPE POD LANDING PAGE DEPLOYED TO VERCEL.", "highlight");
-                document.getElementById('grad-text').textContent = "You've mastered the Vibe Coding workflow.";
+                // Trigger graduation
+                document.getElementById('grad-name').textContent = `${cadetName} — Certified Vibe Cadet`;
                 document.getElementById('graduation-modal').style.display = 'flex';
+                unlockAchievement("Full Graduate", "Completed the entire Academy");
+                gameState.sandboxMode = true;
+                document.getElementById('sandbox-indicator').style.display = 'inline';
             }
-        }, 100);
+        }, 90);
     }
 
     function handleAgentPrompt(val) {
@@ -280,40 +409,73 @@
         log(`Captain: ${reply}`, 'agent-msg');
     }
 
+    // ==================== MAIN COMMAND PROCESSOR ====================
     function processCommand(raw) {
         const val = raw.trim();
+        if (!val) return;
+
         log(`cadet@vibe:~$ ${val}`, 'cmd-echo');
-        
+
+        // Phase 7 special agent prompt
         if (gameState.phase === 7 && val.toLowerCase().includes("prompt")) {
             handleAgentPrompt(val);
         }
 
+        // Phase 8 special build
         if (gameState.phase === 8 && val === "vibe build escape-pod") {
             simulateBuild();
+            gameState.lesson++;
+            saveProgress();
+            return;
         }
 
-        const obj = phases[gameState.phase].objectives[gameState.lesson];
-        if (obj.cmd.some(c => val.includes(c))) {
-            log(obj.response, 'lola-msg');
-            if (gameState.phase === 5) addAgent("Manager", "Captain");
-            if (gameState.phase === 6) addAgent("Specialist", "Engineer");
-            
+        if (gameState.sandboxMode) {
+            log("✅ Sandbox mode: Command accepted. Free practice enabled!", 'success');
+            return;
+        }
+
+        const phaseData = phases[gameState.phase];
+        const currentObj = phaseData.objectives[gameState.lesson];
+
+        const matched = fuzzyMatch(val, currentObj.cmd);
+
+        if (matched) {
+            log(currentObj.response, 'lola-msg');
+
+            // Phase unlocks
+            if (gameState.phase === 5) {
+                document.getElementById('agent-pane').classList.remove('hidden');
+                document.getElementById('logs-pane').classList.remove('hidden');
+                addAgent("Manager", "Captain");
+                unlockAchievement("First Agent", "You built your first AI crew member");
+            }
+            if (gameState.phase === 6) {
+                addAgent("Specialist", "Engineer");
+            }
+
             gameState.lesson++;
-            if (gameState.lesson >= phases[gameState.phase].objectives.length) {
+
+            if (gameState.lesson >= phaseData.objectives.length) {
+                gameState.completedPhases.push(gameState.phase);
+                unlockAchievement(`Phase ${gameState.phase} Master`, phaseData.title);
+
                 gameState.phase++;
                 gameState.lesson = 0;
-                if (gameState.phase <= 8) setTimeout(initPhase, 800);
-            } else {
-                log(`NEXT: ${phases[gameState.phase].objectives[gameState.lesson].desc}`, 'highlight');
-            }
-        }
-        updateUI();
-    }
 
-    function updateUI() {
-        const progress = ((gameState.phase - 1) / 8) * 100;
-        document.getElementById('progress-fill').style.width = `${progress}%`;
-        document.getElementById('phase-display').textContent = `Phase ${gameState.phase}/8`;
+                if (gameState.phase <= 8) {
+                    setTimeout(initPhase, 800);
+                }
+            } else {
+                log(`NEXT: ${phaseData.objectives[gameState.lesson].desc}`, 'highlight');
+            }
+
+            updateProgress();
+            saveProgress();
+        } else {
+            // Smart hint
+            log(`⚠️  Not quite. Hint: ${currentObj.desc}`, 'crit-msg');
+            log(`L.O.L.A. tip: Try something close to '${currentObj.cmd[0]}'`, 'lola-msg');
+        }
     }
 
     function initPhase() {
@@ -321,18 +483,53 @@
         log(`\n=== ${p.title} ===`, 'highlight');
         log(p.lola, 'lola-msg');
         log(`OBJECTIVE: ${p.objectives[0].desc}`, 'highlight');
-        updateUI();
+        updateProgress();
     }
 
-    document.getElementById('command-input').addEventListener('keydown', (e) => {
+    // ==================== MODALS ====================
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    }
+
+    function shareOnX() {
+        const text = `I just graduated Vibe Cadet Academy! 🔥\nI now know terminals, git, agents, prompting & shipping with AI.\n\nTry it yourself → (paste this link)`;
+        window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+        closeModal();
+    }
+
+    function restartAcademy() {
+        if (confirm("Restart the entire Academy from the beginning?")) {
+            localStorage.removeItem('vibeCadetAcademySave');
+            location.reload();
+        }
+    }
+
+    // ==================== STARTUP ====================
+    input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && e.target.value) {
             processCommand(e.target.value);
             e.target.value = '';
         }
     });
 
-    log("Booting Vibe Academy...", 'system-msg', systemLogs);
-    setTimeout(initPhase, 500);
+    function bootSequence() {
+        log("Booting Vibe Academy...", 'system-msg', systemLogs);
+        setTimeout(() => {
+            cadetName = prompt("Enter your callsign, Cadet:", "Alex") || "Cadet";
+            document.getElementById('cadet-name-display').textContent = cadetName;
+            log(`Welcome aboard, ${cadetName}. Training begins now.`, 'lola-msg');
+
+            loadProgress();
+            if (gameState.phase === 1 && gameState.lesson === 0) {
+                initPhase();
+            } else {
+                log("📌 Progress restored — continue where you left off!", 'highlight');
+                updateProgress();
+            }
+        }, 600);
+    }
+
+    bootSequence();
 </script>
 </body>
 </html>
